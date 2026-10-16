@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --purple: #7c5dfa;
+  --purple-light: #9277ff;
+  --ink: #0c0e16;
+  --muted: #7e88c3;
+  --muted-light: #888eb0;
+  --muted-blue: #7e88c3;
+  --border: #dfe3fa;
+  --canvas: #f8f8fb;
+  --surface: #ffffff;
+  --surface-subtle: #f9fafe;
+  --danger: #ec5757;
+  --danger-light: #ff9797;
+  --deep: #0c0e16;
+
+  --sidebar: #373b53;
+  --sidebar-border: #494e6e;
+  --button-dark: #252945;
+  --button-dark-hover: #1e2139;
+  --button-secondary: #dfe3fa;
+  --button-surface-subtle: #f9fafe;
+  --button-muted: #7e88c3;
+  --button-muted-light: #888eb0;
+  --button-muted-blue: #7e88c3;
+  --button-border: #dfe3fa;
+  --button-purple: #7c5dfa;
+  --button-purple-light: #9277ff;
+  --button-danger: #ec5757;
+  --button-danger-light: #ff9797;
+  --button-sidebar: #373b53;
+  --button-deep: #0c0e16;
+
+  --status-paid: #33d69f;
+  --status-pending: #ff8f00;
+  --status-draft: #373b53;
+
+  --shadow-navy: 72, 84, 159;
+}
+
+.dark {
+  --ink: #ffffff;
+  --muted: #dfe3fa;
+  --muted-light: #dfe3fa;
+  --border: #252945;
+  --canvas: #141625;
+  --surface: #1e2139;
+  --surface-subtle: #252945;
+  --status-draft: #dfe3fa;
+
+  --button-surface-subtle: #252945;
+  --button-muted: #dfe3fa;
+  --button-muted-light: #dfe3fa;
+  --button-border: #252945;
+}
+
+@theme inline {
+  --color-purple: var(--purple);
+  --color-purple-light: var(--purple-light);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-muted-blue: var(--muted-blue);
+  --color-border: var(--border);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-danger: var(--danger);
+  --color-danger-light: var(--danger-light);
+  --color-deep: var(--deep);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-button-dark: var(--button-dark);
+  --color-button-dark-hover: var(--button-dark-hover);
+  --color-button-secondary: var(--button-secondary);
+  --color-button-surface-subtle: var(--button-surface-subtle);
+  --color-button-muted: var(--button-muted);
+  --color-button-muted-light: var(--button-muted-light);
+  --color-button-muted-blue: var(--button-muted-blue);
+  --color-button-border: var(--button-border);
+  --color-button-purple: var(--button-purple);
+  --color-button-purple-light: var(--button-purple-light);
+  --color-button-danger: var(--button-danger);
+  --color-button-danger-light: var(--button-danger-light);
+  --color-button-sidebar: var(--button-sidebar);
+  --color-button-deep: var(--button-deep);
+  --color-status-paid: var(--status-paid);
+  --color-status-pending: var(--status-pending);
+  --color-status-draft: var(--status-draft);
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+
+  --font-sans: var(--font-league-spartan);
+  --font-mono: var(--font-geist-mono);
+}
+
+@utility scrollbar-purple {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: var(--purple);
+  }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .scrollbar-purple {
+    scrollbar-width: thin;
+    scrollbar-color: var(--purple) transparent;
+  }
+}
+
+@layer base {
+  html {
+    min-height: 100dvh;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    font-size: var(--font-size-body);
+    font-weight: 500;
+    line-height: 1.3846;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  select {
+    cursor: pointer;
+  }
+}
