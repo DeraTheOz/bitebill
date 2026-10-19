@@ -14,9 +14,9 @@ export function AppSidebar() {
         aria-label="BiteBill"
         className="flex shrink-0 items-center">
         <div className="relative flex h-18 w-18 shrink-0 items-center justify-center overflow-hidden rounded-br-[20px] bg-purple md:h-20 md:w-20 lg:h-18 lg:w-18">
-          <div className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-[20px] bg-purple-light mask-[url('/invoices/logo-bg.svg')] mask-repeat:no-repeat mask-size-[100%_100%]" />
+          <div className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-[20px] bg-purple-light mask-[url('/assets/logo-bg.svg')] mask-repeat:no-repeat mask-size-[100%_100%]" />
           <Image
-            src="/invoices/logo-white.svg"
+            src="/assets/logo-white.svg"
             width={32}
             height={32}
             alt=""
@@ -40,7 +40,7 @@ export function AppSidebar() {
 
         <div className="grid h-18 w-18 place-items-center border-l border-sidebar-border md:h-20 md:w-20 lg:order-1 lg:h-22 lg:w-1/2 lg:border-l-0 lg:border-r lg:border-sidebar-border">
           <Image
-            src="/invoices/avatar.png"
+            src="/assets/avatar.png"
             width={40}
             height={40}
             className="rounded-full"
