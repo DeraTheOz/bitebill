@@ -62,13 +62,13 @@ export function MobileMenu() {
               className="absolute inset-y-0 left-0 flex w-96 max-w-[80%] flex-col bg-sidebar shadow-2xl">
               <div className="flex h-18 items-center justify-between border-b border-sidebar-border md:h-20">
                 <div className="relative flex h-18 w-18 items-center justify-center overflow-hidden rounded-br-[20px] bg-purple md:h-20 md:w-20">
-                  <div className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-[20px] bg-purple-light [mask-image:url('/invoices/logo-bg.svg')] mask-repeat:no-repeat mask-size-[100%_100%]" />
+                  <div className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-[20px] bg-purple-light [mask-image:url('/assets/logo-bg.svg')] mask-repeat:no-repeat mask-size-[100%_100%]" />
                   <Link
                     href="/dashboard"
                     aria-label="bitebill logo"
                     onClick={close}>
                     <Image
-                      src="/invoices/logo-white.svg"
+                      src="/assets/logo-white.svg"
                       width={32}
                       height={32}
                       alt="BiteBill"
