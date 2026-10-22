@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, League_Spartan } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { Providers } from "./providers";
 import { ThemeProvider } from "@/features/theme/provider/theme-provider";
 import { themeInitScript } from "@/features/theme/theme";
 
@@ -32,9 +33,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <Providers>
+          <ThemeProvider>{children}</ThemeProvider>
 
-        <Toaster />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
