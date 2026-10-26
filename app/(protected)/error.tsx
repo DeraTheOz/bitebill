@@ -14,5 +14,10 @@ export default function ProtectedError({
     console.error(error);
   }, [error]);
 
-  return <ErrorState className="pt-18 md:pt-20 lg:pt-0" onRetry={reset} />;
+  return (
+    <ErrorState
+      className="min-h-screen pt-18 md:pt-20 lg:pt-0"
+      onRetry={reset}
+    />
+  );
 }
