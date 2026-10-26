@@ -26,16 +26,24 @@ import { ClientInvoiceHealth } from "./client-invoice-health";
 import { ClientInfoSection } from "./client-info-section";
 import { ClientHeader } from "./client-header";
 import { useClient, useDeleteClient } from "../hooks/use-client-queries";
+import { useInvoices } from "@/features/invoices/hooks/use-invoice-queries";
+import type { InvoiceSummary } from "@/features/invoices/types/invoice";
 
-import {
-  formatMoney,
-  getClientInvoices,
-  getInvoiceCounts,
-} from "../lib/helpers";
+import { formatMoney } from "@/lib/format";
+import { useBranding } from "@/features/branding/components/branding-provider";
 import { ApiError } from "../lib/api";
+
+const EMPTY_COUNTS: InvoiceSummary["counts"] = {
+  all: 0,
+  paid: 0,
+  pending: 0,
+  overdue: 0,
+  draft: 0,
+};
 
 export function ClientDetail({ clientId }: { clientId: string }) {
   const router = useRouter();
+  const branding = useBranding();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -49,6 +57,12 @@ export function ClientDetail({ clientId }: { clientId: string }) {
 
   const deleteClient = useDeleteClient();
   const isDeleting = deleteClient.isPending;
+
+  const { data: invoiceData } = useInvoices({
+    clientId,
+    page: 1,
+    pageSize: 1,
+  });
 
   function handleDelete() {
     if (!client) return;
@@ -97,20 +111,12 @@ export function ClientDetail({ clientId }: { clientId: string }) {
     );
   }
 
-  const invoices = getClientInvoices(client.id);
-  const counts = getInvoiceCounts(client.id);
+  const summary = invoiceData?.summary;
+  const counts = summary?.counts ?? EMPTY_COUNTS;
 
-  const billed = invoices
-    .filter((invoice) => invoice.status !== "draft")
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
-  const paid = invoices
-    .filter((invoice) => invoice.status === "paid")
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
-  const outstanding = invoices
-    .filter(
-      (invoice) => invoice.status === "pending" || invoice.status === "overdue",
-    )
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
+  const billed = summary?.billed ?? 0;
+  const paid = summary?.paidTotal ?? 0;
+  const outstanding = summary?.outstanding ?? 0;
   const outstandingCount = counts.pending + counts.overdue;
   const paidPct = billed > 0 ? Math.round((paid / billed) * 100) : 0;
 
@@ -134,19 +140,19 @@ export function ClientDetail({ clientId }: { clientId: string }) {
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <ClientMetricCard
             label="Total Billed"
-            value={formatMoney(billed)}
-            hint={`${invoices.length} invoices issued`}
+            value={formatMoney(billed, branding.currency)}
+            hint={`${counts.all} invoices issued`}
             icon={Wallet}
           />
           <ClientMetricCard
             label="Paid"
-            value={formatMoney(paid)}
+            value={formatMoney(paid, branding.currency)}
             hint={`${paidPct}% of billed`}
             icon={CircleCheck}
           />
           <ClientMetricCard
             label="Outstanding"
-            value={formatMoney(outstanding)}
+            value={formatMoney(outstanding, branding.currency)}
             hint={
               outstandingCount
                 ? `${outstandingCount} awaiting payment`
@@ -156,15 +162,13 @@ export function ClientDetail({ clientId }: { clientId: string }) {
           />
           <ClientMetricCard
             label="Invoices"
-            value={String(invoices.length)}
+            value={String(counts.all)}
             hint={`${counts.paid} paid · ${counts.draft} draft`}
             icon={FileText}
           />
         </div>
 
-        {invoices.length > 0 && (
-          <ClientInvoiceHealth clientId={clientId} invoices={invoices} />
-        )}
+        {counts.all > 0 && <ClientInvoiceHealth counts={counts} />}
 
         <ClientInfoSection
           client={client}

@@ -2,18 +2,22 @@
 
 import { ClientInvoiceFilter } from "./client-invoice-filter";
 import { ClientInvoiceCard } from "./client-invoice-card";
-import { PaginationBar } from "./pagination-bar";
+import { PaginationBar } from "@/components/pagination-bar";
+import { ErrorState } from "@/components/errors/error-state";
 import { useClientInvoice } from "../hooks/use-client-invoice";
+import { ClientInvoiceCardSkeleton } from "./client-invoice-card-skeleton";
 
 export function ClientInvoiceSection({ clientId }: { clientId: string }) {
   const {
-    PAGE_SIZE,
-    currentPage,
-    pageCount,
-    counts,
     statusFilter,
-    filteredInvoices,
-    visibleInvoices,
+    page,
+    counts,
+    invoices,
+    pagination,
+    isPending,
+    isPlaceholderData,
+    isError,
+    refetch,
     setPage,
     handleFilterChange,
   } = useClientInvoice(clientId);
@@ -28,7 +32,7 @@ export function ClientInvoiceSection({ clientId }: { clientId: string }) {
             Invoices
           </h2>
           <p className="mt-1 text-[13px] font-medium tracking-[-0.1px] text-muted-light">
-            {filteredInvoices.length} of {counts.all} invoices
+            {pagination?.total ?? 0} of {counts.all} invoices
           </p>
         </div>
 
@@ -40,12 +44,37 @@ export function ClientInvoiceSection({ clientId }: { clientId: string }) {
       </div>
 
       <div className="mt-5 rounded-lg">
-        {visibleInvoices.length ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {visibleInvoices.map((invoice) => (
-              <ClientInvoiceCard key={invoice.id} invoice={invoice} />
-            ))}
-          </div>
+        {isPending ? (
+          <ClientInvoiceCardSkeleton />
+        ) : isError ? (
+          <ErrorState
+            title="Could not load invoices"
+            description="We couldn't fetch this client's invoices. Try again."
+            onRetry={() => void refetch()}
+          />
+        ) : invoices.length ? (
+          <>
+            <div
+              aria-busy={isPlaceholderData}
+              className={`grid gap-4 transition-opacity sm:grid-cols-2 ${
+                isPlaceholderData ? "opacity-60" : ""
+              }`}>
+              {invoices.map((invoice) => (
+                <ClientInvoiceCard key={invoice.id} invoice={invoice} />
+              ))}
+            </div>
+
+            {pagination && (
+              <PaginationBar
+                page={page}
+                pageCount={pagination.totalPages}
+                pageSize={pagination.pageSize}
+                total={pagination.total}
+                onPageChange={setPage}
+                label="Invoice pagination"
+              />
+            )}
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
             <p className="text-[15px] font-bold text-ink">
@@ -59,15 +88,6 @@ export function ClientInvoiceSection({ clientId }: { clientId: string }) {
             </p>
           </div>
         )}
-
-        <PaginationBar
-          page={currentPage}
-          pageCount={pageCount}
-          pageSize={PAGE_SIZE}
-          total={filteredInvoices.length}
-          onPageChange={setPage}
-          label="Invoice pagination"
-        />
       </div>
     </section>
   );

@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { useClickOutside } from "@/hooks/use-click-outside";
-import type { InvoiceStatusFilter } from "../types/client-invoice";
+import type { InvoiceStatusFilter } from "@/features/invoices/types/invoice";
 
 const options: Array<{ value: InvoiceStatusFilter; label: string }> = [
   { value: "all", label: "All" },
