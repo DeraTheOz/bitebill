@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { NavLinks } from "./nav-links";
+import { SignOutButton } from "./sign-out-button";
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,8 +87,9 @@ export function MobileMenu() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-3 py-6">
+              <div className="flex flex-1 flex-col overflow-y-auto px-3 py-6">
                 <NavLinks onNavigate={close} />
+                <SignOutButton className="mt-auto" onSignOut={close} />
               </div>
             </motion.div>
           </motion.div>
