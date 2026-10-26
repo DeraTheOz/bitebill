@@ -2,6 +2,7 @@
 
 import { auth } from "../lib/server";
 import { signUpSchema } from "../schemas/validation";
+import { generateAvatar } from "@/lib/avatar";
 import { redirect } from "next/navigation";
 
 /**
@@ -26,10 +27,11 @@ export async function signUpWithEmail(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { error } = await auth.signUp.email(parsed.data);
+  const { error } = await auth.signUp.email({
+    ...parsed.data,
+    image: generateAvatar({ seed: parsed.data.email }),
+  });
   if (error) return { error: error.message || "Failed to create account" };
 
-  redirect(
-    `/auth/verify-email?email=${encodeURIComponent(parsed.data.email)}`,
-  );
+  redirect(`/auth/verify-email?email=${encodeURIComponent(parsed.data.email)}`);
 }
