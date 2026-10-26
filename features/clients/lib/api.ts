@@ -1,14 +1,20 @@
-import type { Client, ClientListPagination } from "../types/client";
+import type {
+  Client,
+  ClientActivityFilter,
+  ClientListItem,
+  ClientListPagination,
+} from "../types/client";
 import type { ClientFormValues } from "../schemas/client-schema";
 
 export type ClientListRequest = {
   page: number;
   pageSize?: number;
   q?: string;
+  activity?: ClientActivityFilter;
 };
 
 export type ClientListResult = {
-  clients: Client[];
+  clients: ClientListItem[];
   pagination: ClientListPagination;
 };
 
@@ -41,12 +47,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const clientsApi = {
-  list: async ({ page, pageSize = 10, q }: ClientListRequest) => {
+  list: async ({ page, pageSize = 10, q, activity }: ClientListRequest) => {
     const search = new URLSearchParams({
       page: String(page),
       pageSize: String(pageSize),
     });
     if (q) search.set("q", q);
+    if (activity) search.set("activity", activity);
 
     return request<ClientListResult>(`/api/clients?${search.toString()}`);
   },

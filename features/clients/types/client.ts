@@ -6,6 +6,8 @@ export type ClientAddress = {
   country: string | null;
 };
 
+export type ClientActivityFilter = "with" | "without";
+
 export type Client = {
   id: string;
   name: string;
@@ -17,6 +19,10 @@ export type Client = {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type ClientListItem = Client & {
+  invoiceCount: number;
 };
 
 export type ClientListPagination = {

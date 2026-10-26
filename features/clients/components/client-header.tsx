@@ -1,6 +1,7 @@
-import { ClientAvatar } from "./client-avatar";
+import { Avatar } from "@/components/avatar";
 import { copyClientId } from "../hooks/use-copy-client-id";
-import { formatDate, shortClientId } from "../lib/helpers";
+import { shortClientId } from "../lib/helpers";
+import { formatDate } from "@/lib/format";
 import { Client } from "../types/client";
 import { Copy } from "lucide-react";
 import { EditButton } from "@/components/buttons/edit-button";
@@ -23,7 +24,7 @@ export function ClientHeader({
     <div className="mt-5 rounded-lg bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] md:mt-8 md:p-8">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div className="flex flex-wrap items-start gap-5">
-          <ClientAvatar
+          <Avatar
             name={client.name}
             image={client.image}
             className="size-16 text-[20px] md:size-20 md:text-[24px]"

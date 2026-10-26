@@ -6,15 +6,22 @@ import {
 } from "@tanstack/react-query";
 import { clientsApi } from "../lib/api";
 import type { ClientFormValues } from "../schemas/client-schema";
+import type { ClientActivityFilter } from "../types/client";
+
+export type ClientListQuery = {
+  page: number;
+  pageSize?: number;
+  q?: string;
+  activity?: ClientActivityFilter;
+};
 
 export const clientKeys = {
   all: ["clients"] as const,
-  list: (params: { page: number; q?: string }) =>
-    ["clients", "list", params] as const,
+  list: (params: ClientListQuery) => ["clients", "list", params] as const,
   detail: (id: string) => ["client", id] as const,
 };
 
-export function useClients(params: { page: number; q?: string }) {
+export function useClients(params: ClientListQuery) {
   return useQuery({
     queryKey: clientKeys.list(params),
     queryFn: () => clientsApi.list(params),

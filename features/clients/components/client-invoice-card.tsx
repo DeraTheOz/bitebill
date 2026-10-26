@@ -1,23 +1,23 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { ClientInvoiceStatusBadge } from "./client-invoice-status";
-import type { ClientInvoice } from "../types/client-invoice";
-import { formatDate, formatMoney } from "../lib/helpers";
+import type { InvoiceListItem } from "@/features/invoices/types/invoice";
+import { formatDate, formatMoney } from "@/lib/format";
 
-export function ClientInvoiceCard({ invoice }: { invoice: ClientInvoice }) {
+export function ClientInvoiceCard({ invoice }: { invoice: InvoiceListItem }) {
   return (
     <Link
       href={`/invoices/${invoice.id}`}
-      aria-label={`Open invoice ${invoice.id}`}
+      aria-label={`Open invoice ${invoice.invoiceNumber}`}
       className="group relative flex flex-col gap-4 overflow-hidden rounded-lg border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-purple focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span className="block text-[15px] font-bold tracking-[-0.25px] text-ink">
             <span className="text-muted-light">#</span>
-            {invoice.id}
+            {invoice.invoiceNumber}
           </span>
           <span className="mt-1 block wrap-anywhere text-[13px] font-medium tracking-[-0.1px] text-muted">
-            {invoice.description}
+            {invoice.clientName}
           </span>
         </div>
         <ClientInvoiceStatusBadge status={invoice.status} />
@@ -27,16 +27,16 @@ export function ClientInvoiceCard({ invoice }: { invoice: ClientInvoice }) {
         <div className="text-[13px] leading-4.5 text-muted-light">
           <p>
             Issued{" "}
-            <span className="text-muted">{formatDate(invoice.issuedAt)}</span>
+            <span className="text-muted">{formatDate(invoice.issueDate)}</span>
           </p>
           <p className="mt-1">
-            Due <span className="text-muted">{formatDate(invoice.dueAt)}</span>
+            Due <span className="text-muted">{formatDate(invoice.dueDate)}</span>
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <strong className="text-[17px] font-bold tracking-[-0.25px] text-ink">
-            {formatMoney(invoice.amount)}
+            {formatMoney(invoice.total, invoice.currency)}
           </strong>
           <ArrowUpRight
             size={16}

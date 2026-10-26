@@ -3,6 +3,7 @@ import type { ButtonProps } from "./button";
 export function MarkAsPaidButton({
   className = "",
   type = "button",
+  children = "Mark as Paid",
   ...props
 }: ButtonProps) {
   return (
@@ -10,7 +11,7 @@ export function MarkAsPaidButton({
       type={type}
       className={`h-12 w-32.75 rounded-3xl bg-button-purple px-5 text-[15px] font-bold text-white transition-colors hover:bg-button-purple-light ${className}`}
       {...props}>
-      Mark as Paid
+      {children}
     </button>
   );
 }

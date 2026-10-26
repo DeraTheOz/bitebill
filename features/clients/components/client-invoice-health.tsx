@@ -1,17 +1,10 @@
-import { getInvoiceCounts } from "../lib/helpers";
-import { ClientInvoice } from "../types/client-invoice";
+import type { InvoiceSummary } from "@/features/invoices/types/invoice";
 
 interface ClientInvoiceHealthProps {
-  clientId: string;
-  invoices: ClientInvoice[];
+  counts: InvoiceSummary["counts"];
 }
 
-export function ClientInvoiceHealth({
-  clientId,
-  invoices,
-}: ClientInvoiceHealthProps) {
-  const counts = getInvoiceCounts(clientId);
-
+export function ClientInvoiceHealth({ counts }: ClientInvoiceHealthProps) {
   const healthSegments = [
     { label: "Paid", count: counts.paid, className: "bg-status-paid" },
     {
@@ -51,7 +44,7 @@ export function ClientInvoiceHealth({
           <span
             key={segment.label}
             style={{
-              width: `${(segment.count / invoices.length) * 100}%`,
+              width: `${(segment.count / counts.all) * 100}%`,
             }}
             className={segment.className}
           />

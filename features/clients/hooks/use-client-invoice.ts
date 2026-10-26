@@ -1,52 +1,56 @@
-import { useMemo, useState } from "react";
-import { InvoiceStatusFilter } from "../types/client-invoice";
-import { getClientInvoices, getInvoiceCounts } from "../lib/helpers";
+"use client";
+
+import { useState } from "react";
+import type { InvoiceStatusFilter } from "@/features/invoices/types/invoice";
+import { useInvoices } from "@/features/invoices/hooks/use-invoice-queries";
 
 const PAGE_SIZE = 10;
+
+const EMPTY_COUNTS = {
+  all: 0,
+  paid: 0,
+  pending: 0,
+  overdue: 0,
+  draft: 0,
+};
 
 export function useClientInvoice(clientId: string) {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>("all");
   const [page, setPage] = useState(1);
 
-  const counts = useMemo(() => getInvoiceCounts(clientId), [clientId]);
-
-  const filteredInvoices = useMemo(() => {
-    const invoices = getClientInvoices(clientId);
-    if (statusFilter === "all") return invoices;
-    return invoices.filter((invoice) => invoice.status === statusFilter);
-  }, [clientId, statusFilter]);
-
-  const pageCount = Math.max(1, Math.ceil(filteredInvoices.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const visibleInvoices = filteredInvoices.slice(
-    startIndex,
-    startIndex + PAGE_SIZE,
-  );
-
-  function handleFilterChange(filter: InvoiceStatusFilter) {
-    setStatusFilter(filter);
+  // A new filter always starts from the first page of results.
+  const [lastFilter, setLastFilter] = useState(statusFilter);
+  if (lastFilter !== statusFilter) {
+    setLastFilter(statusFilter);
     setPage(1);
   }
 
-  const pageNumbers = Array.from(
-    { length: pageCount },
-    (_, index) => index + 1,
-  );
+  const { data, isPending, isPlaceholderData, isError, refetch } = useInvoices({
+    clientId,
+    page,
+    pageSize: PAGE_SIZE,
+    status: statusFilter === "all" ? undefined : [statusFilter],
+  });
+
+  const invoices = data?.invoices ?? [];
+  const pagination = data?.pagination;
+  const counts = data?.summary?.counts ?? EMPTY_COUNTS;
+
+  function handleFilterChange(filter: InvoiceStatusFilter) {
+    setStatusFilter(filter);
+  }
 
   return {
-    PAGE_SIZE,
     statusFilter,
     page,
     counts,
-    filteredInvoices,
-    pageCount,
-    currentPage,
-    startIndex,
-    visibleInvoices,
-    pageNumbers,
+    invoices,
+    pagination,
+    isPending,
+    isPlaceholderData,
+    isError,
+    refetch,
     setPage,
-    setStatusFilter,
     handleFilterChange,
   };
 }

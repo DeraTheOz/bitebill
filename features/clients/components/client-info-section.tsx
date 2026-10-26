@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import { ClientContactRow } from "./client-contact-row";
-import { formatDate, shortClientId } from "../lib/helpers";
+import { shortClientId } from "../lib/helpers";
+import { formatDate } from "@/lib/format";
 import { Client } from "../types/client";
 
 interface ClientInfoProps {

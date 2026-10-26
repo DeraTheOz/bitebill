@@ -1,7 +1,7 @@
-import type { ClientInvoiceStatus } from "../types/client-invoice";
+import type { InvoiceStatus } from "@/features/invoices/types/invoice";
 
 const statusStyles: Record<
-  ClientInvoiceStatus,
+  InvoiceStatus,
   { label: string; className: string }
 > = {
   paid: { label: "Paid", className: "bg-status-paid/[0.06] text-status-paid" },
@@ -23,7 +23,7 @@ export function ClientInvoiceStatusBadge({
   status,
   className = "",
 }: {
-  status: ClientInvoiceStatus;
+  status: InvoiceStatus;
   className?: string;
 }) {
   const style = statusStyles[status];

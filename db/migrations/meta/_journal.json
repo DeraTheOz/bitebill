@@ -15,6 +15,20 @@
       "when": 1792670834290,
       "tag": "0001_stormy_wallow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792687292526,
+      "tag": "0002_familiar_thor_girl",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792924908743,
+      "tag": "0003_unusual_shadow_king",
+      "breakpoints": true
     }
   ]
 }

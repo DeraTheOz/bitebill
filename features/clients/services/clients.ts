@@ -1,11 +1,16 @@
 import "server-only";
 
-import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, isNull, not, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { clients } from "@/db/schema";
 import { generateAvatar } from "@/lib/avatar";
 import type { ClientFormValues } from "../schemas/client-schema";
-import type { Client, ClientListPagination } from "../types/client";
+import type {
+  Client,
+  ClientActivityFilter,
+  ClientListItem,
+  ClientListPagination,
+} from "../types/client";
 
 type ClientRow = typeof clients.$inferSelect;
 
@@ -13,10 +18,11 @@ export type ClientListParams = {
   page: number;
   pageSize: number;
   q?: string;
+  activity?: ClientActivityFilter;
 };
 
 export type PaginatedClients = {
-  clients: Client[];
+  clients: ClientListItem[];
   pagination: ClientListPagination;
 };
 
@@ -28,6 +34,18 @@ function toNull(value: string) {
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
 }
+
+const invoiceCountSql = sql<number>`(
+  select count(*)::int from "invoices"
+  where "invoices"."client_id" = "clients"."id"
+    and "invoices"."deleted_at" is null
+)`.as("invoice_count");
+
+const hasInvoicesSql = sql`exists (
+  select 1 from "invoices"
+  where "invoices"."client_id" = "clients"."id"
+    and "invoices"."deleted_at" is null
+)`;
 
 function toClientDto(row: ClientRow): Client {
   return {
@@ -70,21 +88,34 @@ function searchFilter(q?: string) {
   );
 }
 
+function activityFilter(activity?: ClientActivityFilter) {
+  if (!activity) return undefined;
+  return activity === "with" ? hasInvoicesSql : not(hasInvoicesSql);
+}
+
 export async function listClients(
   userId: string,
   params: ClientListParams,
 ): Promise<PaginatedClients> {
-  const { page, pageSize, q } = params;
+  const { page, pageSize, q, activity } = params;
 
   // `count(*) over()` returns the total matching rows alongside each
   // page row, so list + total cost a single query.
   const rows = await db
     .select({
       client: clients,
-      total: sql<number>`count(*) over()`.as("total"),
+      invoiceCount: invoiceCountSql,
+      total: sql<number>`(count(*) over())::int`.as("total"),
     })
     .from(clients)
-    .where(and(ownership(userId), notDeleted(), searchFilter(q)))
+    .where(
+      and(
+        ownership(userId),
+        notDeleted(),
+        searchFilter(q),
+        activityFilter(activity),
+      ),
+    )
     .orderBy(desc(clients.createdAt))
     .limit(pageSize)
     .offset((page - 1) * pageSize);
@@ -99,7 +130,10 @@ export async function listClients(
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return {
-    clients: rows.map((row) => toClientDto(row.client)),
+    clients: rows.map((row) => ({
+      ...toClientDto(row.client),
+      invoiceCount: row.invoiceCount,
+    })),
     pagination: {
       page,
       pageSize,

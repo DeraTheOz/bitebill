@@ -14,5 +14,5 @@ export default function Error({
     console.error(error);
   }, [error]);
 
-  return <ErrorState onRetry={reset} />;
+  return <ErrorState className="min-h-screen" onRetry={reset} />;
 }

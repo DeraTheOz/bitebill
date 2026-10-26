@@ -17,7 +17,7 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <div
-      className={`flex min-h-screen w-full flex-col items-center justify-center gap-6 px-6 text-center ${className}`}>
+      className={`flex w-full flex-col items-center justify-center gap-6 px-6 text-center ${className}`}>
       <span className="grid size-16 place-items-center rounded-full bg-danger/10 text-danger">
         <AlertTriangle className="size-8" aria-hidden="true" />
       </span>
