@@ -6,7 +6,8 @@ import { ClientListSkeleton } from "./client-list-skeleton";
 import { ClientEmptyState, ClientNoResultsState } from "./client-empty-state";
 import { ClientFormDrawer } from "./client-form-drawer";
 import { ClientSearch } from "./client-search";
-import { PaginationBar } from "./pagination-bar";
+import { ClientFilter } from "./client-filter";
+import { PaginationBar } from "@/components/pagination-bar";
 import { ErrorState } from "@/components/errors/error-state";
 import { useClientWorkspace } from "../hooks/use-client-workspace";
 
@@ -17,6 +18,7 @@ export function ClientWorkspace() {
     isCreateOpen,
     clients,
     pagination,
+    selectedFilters,
     hasActiveSearch,
     isPending,
     isPlaceholderData,
@@ -25,6 +27,7 @@ export function ClientWorkspace() {
     setQuery,
     setPage,
     setIsCreateOpen,
+    toggleFilter,
   } = useClientWorkspace();
 
   return (
@@ -32,19 +35,25 @@ export function ClientWorkspace() {
       <section className="mx-auto w-full max-w-182.5">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-x-4 gap-y-6 md:mb-16">
           <div>
-            <h1 className="text-[36px] font-bold leading-none tracking-[-1.125px]">
+            <h1 className="text-[32px] font-bold leading-none tracking-[-1.125px] sm:text-[36px]">
               Clients
             </h1>
             <p className="mt-2 text-[13px] font-medium tracking-[-0.1px] text-muted-light">
               <span className="hidden sm:inline">There are </span>
-              <span className="sm:hidden">{pagination?.total ?? 0} clients</span>
+              <span className="sm:hidden">
+                {pagination?.total ?? 0} clients
+              </span>
               <span className="hidden sm:inline">
                 {pagination?.total ?? 0} total clients
               </span>
             </p>
           </div>
 
-          <div className="ml-auto flex items-center gap-5 md:gap-10">
+          <div className="flex w-full items-center justify-between gap-5 sm:ml-auto sm:w-auto md:gap-10">
+            <ClientFilter
+              selectedFilters={selectedFilters}
+              onToggle={toggleFilter}
+            />
             <button
               type="button"
               onClick={() => setIsCreateOpen(true)}
@@ -77,6 +86,7 @@ export function ClientWorkspace() {
               isPlaceholderData ? "opacity-60" : ""
             }`}>
             <ClientList clients={clients} />
+
             {pagination && (
               <PaginationBar
                 page={page}

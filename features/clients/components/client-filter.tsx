@@ -4,9 +4,9 @@ import { useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { useClickOutside } from "@/hooks/use-click-outside";
 
-export type ClientActivityFilter = "with-invoices" | "no-invoices";
+export type ClientListActivityFilter = "with-invoices" | "no-invoices";
 
-const filters: Array<{ value: ClientActivityFilter; label: string }> = [
+const filters: Array<{ value: ClientListActivityFilter; label: string }> = [
   { value: "with-invoices", label: "With invoices" },
   { value: "no-invoices", label: "No invoices yet" },
 ];
@@ -15,8 +15,8 @@ export function ClientFilter({
   selectedFilters,
   onToggle,
 }: {
-  selectedFilters: ClientActivityFilter[];
-  onToggle: (filter: ClientActivityFilter) => void;
+  selectedFilters: ClientListActivityFilter[];
+  onToggle: (filter: ClientListActivityFilter) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,7 @@ export function ClientFilter({
 
       <div
         aria-hidden={!isOpen}
-        className={`absolute right-0 top-9 z-20 w-52 max-w-[calc(100vw-3rem)] rounded-lg bg-surface p-6 transition-[opacity,transform,visibility] duration-150 ease-out dark:bg-surface-subtle ${
+        className={`absolute left-0 right-auto top-9 z-20 w-52 max-w-[calc(100vw-3rem)] rounded-lg bg-surface p-6 transition-[opacity,transform,visibility] duration-150 ease-out sm:left-auto sm:right-0 dark:bg-surface-subtle ${
           isOpen
             ? "visible translate-y-0 opacity-100"
             : "invisible -translate-y-1 opacity-0"

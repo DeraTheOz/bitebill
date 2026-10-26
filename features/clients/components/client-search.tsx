@@ -21,7 +21,7 @@ export function ClientSearch({
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Search by id, name, or email"
+        placeholder="Search by name, email, or company"
         aria-label="Search clients"
         className="h-12 w-full rounded-lg border border-border bg-surface max-[375px]:pl-11 max-[375px]:pr-4 pl-16 pr-10 text-[15px] font-medium tracking-[-0.25px] text-ink caret-purple outline-none transition-colors placeholder:text-muted-light focus:border-purple [&::-webkit-search-cancel-button]:hidden"
       />
