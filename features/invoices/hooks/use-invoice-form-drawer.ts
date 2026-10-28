@@ -2,6 +2,7 @@ import { useRef } from "react";
 import toast from "react-hot-toast";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { addDays, format } from "date-fns";
 import type { z } from "zod";
 import {
   invoiceFormSchema,
@@ -19,18 +20,17 @@ import {
 // InvoiceFormValues on submit.
 type InvoiceFormInput = z.input<typeof invoiceFormSchema>;
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+const isoDate = (date: Date) => format(date, "yyyy-MM-dd");
 
-const isoDate = (date: Date) => date.toISOString().slice(0, 10);
-
-function createDefaults(): InvoiceFormValues {
+function createDefaults(): InvoiceFormInput {
   const now = new Date();
   return {
     clientId: "",
     issueDate: isoDate(now),
-    dueDate: isoDate(new Date(now.getTime() + 30 * DAY_MS)),
+    dueDate: isoDate(addDays(now, 14)),
     notes: "",
-    items: [{ name: "", quantity: 1, unitPrice: 0 }],
+    taxRate: "",
+    items: [{ name: "", quantity: 1, unitPrice: "" }],
   };
 }
 
@@ -45,13 +45,15 @@ export function useInvoiceFormDrawer(
     mode === "edit" ? (invoiceId ?? "") : "",
   );
 
-  const defaults: InvoiceFormValues =
+  const defaults: InvoiceFormInput =
     mode === "edit" && existingInvoice
       ? {
           clientId: existingInvoice.client?.id ?? "",
           issueDate: existingInvoice.issueDate,
           dueDate: existingInvoice.dueDate,
           notes: existingInvoice.publicNotes ?? "",
+          taxRate:
+            Number(existingInvoice.taxRate) > 0 ? existingInvoice.taxRate : "",
           items: existingInvoice.items.map((item) => ({
             name: item.name,
             quantity: item.quantity,
@@ -64,6 +66,8 @@ export function useInvoiceFormDrawer(
     register,
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<InvoiceFormInput, unknown, InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -82,6 +86,7 @@ export function useInvoiceFormDrawer(
   );
 
   const items = useWatch({ control, name: "items" }) ?? [];
+  const taxRate = useWatch({ control, name: "taxRate" }) ?? 0;
 
   async function onSubmit(values: InvoiceFormValues) {
     const intent = intentRef.current;
@@ -119,10 +124,14 @@ export function useInvoiceFormDrawer(
     errors,
     isSubmitting,
     register,
+    control,
+    watch,
+    setValue,
     fields,
-    appendItem: () => append({ name: "", quantity: 1, unitPrice: 0 }),
+    appendItem: () => append({ name: "", quantity: 1, unitPrice: "" }),
     removeItem: remove,
     items,
+    taxRate,
     submit,
     handleSubmit,
     onSubmit,

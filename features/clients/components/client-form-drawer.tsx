@@ -52,7 +52,7 @@ export function ClientFormDrawer({
         <h1 className="text-[24px] font-bold tracking-[-0.75px] text-ink">
           {mode === "edit" ? (
             <>
-              Edit:{" "}
+              Edit Client:{" "}
               <span className="text-muted-light">{existingClient?.name}</span>
             </>
           ) : (

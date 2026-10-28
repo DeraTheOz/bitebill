@@ -163,7 +163,11 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
                 )}
                 {invoice.tax > 0 && (
                   <div className="flex justify-between">
-                    <span>Tax</span>
+                    <span>
+                      {invoice.taxRate > 0
+                        ? `Tax (${invoice.taxRate}%)`
+                        : "Tax"}
+                    </span>
                     <span className="font-bold text-ink">
                       {formatMoney(invoice.tax, invoice.currency)}
                     </span>

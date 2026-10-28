@@ -40,7 +40,7 @@ type InvoiceEventRow = typeof invoiceEvents.$inferSelect;
 type ClientRow = typeof clients.$inferSelect;
 
 const NUMBER_FALLBACK_PREFIX = "INV";
-const CURRENCY_FALLBACK = "GBP";
+const CURRENCY_FALLBACK = "USD";
 const PDF_TEMPLATE_FALLBACK = "classic";
 
 export type InvoiceListParams = {
@@ -156,6 +156,7 @@ function toInvoiceDto(
     dueDate: row.dueDate,
     currency: row.currency,
     subtotal: Number(row.subtotal),
+    taxRate: Number(row.taxRate),
     tax: Number(row.tax),
     discount: Number(row.discount),
     total: Number(row.total),
@@ -173,7 +174,7 @@ function toInvoiceDto(
  * Computes line totals and rollups. The client never supplies these
  * values, totals are always derived from quantities and unit prices.
  */
-function computeTotals(items: InvoiceItemValues[]) {
+function computeTotals(items: InvoiceItemValues[], taxRate: number) {
   const normalized = items.map((item, index) => {
     const total = round2(item.quantity * item.unitPrice);
     return {
@@ -189,8 +190,8 @@ function computeTotals(items: InvoiceItemValues[]) {
   const subtotal = round2(
     normalized.reduce((sum, item) => sum + item.totalNumber, 0),
   );
-  const tax = 0;
   const discount = 0;
+  const tax = round2(((subtotal - discount) * taxRate) / 100);
   const total = round2(subtotal - discount + tax);
 
   return { normalized, subtotal, tax, discount, total };
@@ -364,6 +365,7 @@ export async function createInvoice(
   const invoiceId = crypto.randomUUID();
   const { normalized, subtotal, tax, discount, total } = computeTotals(
     input.values.items,
+    input.values.taxRate,
   );
 
   const branding = await getBrandingSettings(userId);
@@ -397,6 +399,7 @@ export async function createInvoice(
           currency,
           pdfTemplate,
           subtotal: money(subtotal),
+          taxRate: money(input.values.taxRate),
           tax: money(tax),
           discount: money(discount),
           total: money(total),
@@ -457,6 +460,7 @@ export async function updateInvoice(
 
   const { normalized, subtotal, tax, discount, total } = computeTotals(
     input.values.items,
+    input.values.taxRate,
   );
 
   await db.batch([
@@ -468,6 +472,7 @@ export async function updateInvoice(
         issueDate: input.values.issueDate,
         dueDate: input.values.dueDate,
         subtotal: money(subtotal),
+        taxRate: money(input.values.taxRate),
         tax: money(tax),
         discount: money(discount),
         total: money(total),

@@ -1,0 +1,2 @@
+ALTER TABLE "invoices" ADD COLUMN "tax_rate" numeric(5, 2) DEFAULT '0' NOT NULL;--> statement-breakpoint
+ALTER TABLE "invoices" ADD CONSTRAINT "invoices_tax_rate_range" CHECK ("invoices"."tax_rate" >= 0 AND "invoices"."tax_rate" <= 100);

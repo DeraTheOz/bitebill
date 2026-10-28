@@ -8,7 +8,7 @@ export const invoiceItemSchema = z.object({
     .max(999_999),
   unitPrice: z.coerce
     .number()
-    .min(0, "Price can't be negative")
+    .positive("Price must be greater than 0")
     .max(9_999_999),
 });
 
@@ -17,6 +17,11 @@ export const invoiceFormBaseSchema = z.object({
   issueDate: z.iso.date("Select an invoice date"),
   dueDate: z.iso.date("Select a due date"),
   notes: z.string().trim().max(2000, "Notes are too long"),
+  taxRate: z.coerce
+    .number()
+    .min(0, "Tax can't be negative")
+    .max(100, "Tax can't exceed 100%")
+    .default(0),
   items: z
     .array(invoiceItemSchema)
     .min(1, "Add at least one item")

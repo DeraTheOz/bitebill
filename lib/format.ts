@@ -1,3 +1,5 @@
+import { format, isValid, parseISO } from "date-fns";
+
 /**
  * Formats a numeric amount as currency using the narrow symbol for the
  * given ISO 4217 code (e.g. `$1,000.00` instead of `US$1,000.00`).
@@ -53,4 +55,29 @@ export function formatDateTime(isoTimestamp: string) {
     minute: "2-digit",
     timeZone: "UTC",
   });
+}
+
+/**
+ * Safely parses an ISO date string (e.g. `YYYY-MM-DD` or full ISO timestamp)
+ * into a valid `Date` object in local time. Returns `undefined` if the value
+ * is empty, falsy, or represents an invalid date.
+ *
+ * @param value - ISO date string or undefined.
+ * @returns Parsed `Date` instance, or `undefined` if invalid or empty.
+ */
+export function toDate(value: string | undefined): Date | undefined {
+  if (!value) return undefined;
+  const parsed = parseISO(value);
+  return isValid(parsed) ? parsed : undefined;
+}
+
+/**
+ * Formats a `Date` instance as a calendar date string in `YYYY-MM-DD` format
+ * using local time.
+ *
+ * @param date - `Date` instance to format.
+ * @returns Date string formatted as `YYYY-MM-DD`.
+ */
+export function toIsoDate(date: Date): string {
+  return format(date, "yyyy-MM-dd");
 }

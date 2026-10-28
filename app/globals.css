@@ -153,3 +153,71 @@
     cursor: pointer;
   }
 }
+
+select {
+  color-scheme: light;
+}
+
+select option {
+  background-color: #ffffff;
+  color: #0c0e16;
+}
+
+:where(.dark, .dark *) select,
+.dark select {
+  color-scheme: dark;
+}
+
+:where(.dark, .dark *) select option,
+.dark select option {
+  background-color: #1e2139;
+  color: #ffffff;
+}
+
+.bitebill-daypicker [data-selected] button,
+.bitebill-daypicker .rdp-selected button,
+.bitebill-daypicker .rdp-selected .day_button {
+  background-color: var(--color-purple) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+.bitebill-daypicker [data-selected] button:hover,
+.bitebill-daypicker .rdp-selected button:hover {
+  background-color: var(--color-purple-light) !important;
+  color: #ffffff !important;
+}
+
+.bitebill-daypicker [data-today]:not([data-selected]) button,
+.bitebill-daypicker .rdp-today:not(.rdp-selected) button,
+.bitebill-daypicker .rdp-today:not(.rdp-selected) .day_button {
+  box-shadow: inset 0 0 0 1px var(--color-purple);
+}
+
+.bitebill-daypicker select {
+  color-scheme: light;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.bitebill-daypicker select option {
+  background-color: #ffffff;
+  color: #0c0e16;
+}
+
+:where(.dark, .dark *) .bitebill-daypicker select,
+.dark .bitebill-daypicker select {
+  color-scheme: dark;
+  background-color: #1e2139;
+  color: #ffffff;
+}
+
+:where(.dark, .dark *) .bitebill-daypicker select option,
+.dark .bitebill-daypicker select option {
+  background-color: #1e2139;
+  color: #ffffff;
+}
+
+.dark .bitebill-daypicker {
+  color-scheme: dark;
+}

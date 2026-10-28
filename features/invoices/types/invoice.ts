@@ -54,6 +54,7 @@ export type Invoice = {
   dueDate: string;
   currency: string;
   subtotal: number;
+  taxRate: number;
   tax: number;
   discount: number;
   total: number;
