@@ -104,6 +104,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       <main className="px-6 md:px-10">
         <ErrorState
           title="Could not load client"
+          className="min-h-screen"
           description="We couldn't fetch this client. Check your connection and try again."
           onRetry={() => void refetch()}
         />
