@@ -8,8 +8,13 @@ import { useInvoice } from "../hooks/use-invoice-queries";
 import { ApiError } from "../lib/api";
 
 export function InvoiceDetailShell({ invoiceId }: { invoiceId: string }) {
-  const { data: invoice, isPending, isError, error, refetch } =
-    useInvoice(invoiceId);
+  const {
+    data: invoice,
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useInvoice(invoiceId);
 
   if (isPending) {
     return (
@@ -37,6 +42,7 @@ export function InvoiceDetailShell({ invoiceId }: { invoiceId: string }) {
       <main className="px-6 md:px-10">
         <ErrorState
           title="Could not load invoice"
+          className="min-h-screen"
           description="We couldn't fetch this invoice. Check your connection and try again."
           onRetry={() => void refetch()}
         />

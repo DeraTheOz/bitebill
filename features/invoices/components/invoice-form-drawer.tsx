@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef } from "react";
+import { Controller } from "react-hook-form";
+import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { TextField } from "@/components/forms/text-field";
-import { TextAreaField } from "@/components/forms/text-area-field";
 import { SelectField } from "@/components/forms/select-field";
+import { TextAreaField } from "@/components/forms/text-area-field";
 import { FormSection } from "@/components/forms/form-section";
 import { BillFrom } from "@/features/branding/components/bill-from";
 import { useBranding } from "@/features/branding/components/branding-provider";
@@ -16,7 +18,8 @@ import { SaveAsDraftButton } from "@/components/buttons/save-as-draft-button";
 import { SaveChangesButton } from "@/components/buttons/save-changes-button";
 import { SaveAndSendButton } from "@/components/buttons/save-and-send-button";
 import { Spinner } from "@/components/loaders/spinner";
-import { useClients } from "@/features/clients/hooks/use-client-queries";
+import { ClientPicker } from "@/features/clients/components/client-picker";
+import { DatePickerField } from "@/components/forms/date-picker-field";
 import { formatMoney } from "@/lib/format";
 import { useInvoiceFormDrawer } from "../hooks/use-invoice-form-drawer";
 
@@ -42,30 +45,65 @@ export function InvoiceFormDrawer({
     errors,
     isSubmitting,
     register,
+    control,
+    watch,
+    setValue,
     fields,
     appendItem,
     removeItem,
     items,
+    taxRate,
     submit,
     handleSubmit,
     onSubmit,
   } = useInvoiceFormDrawer(mode, onClose, invoiceId);
 
-  // The picker shows the first 50 clients
-  const { data: clientsData, isPending: isLoadingClients } = useClients({
-    page: 1,
-    pageSize: 50,
-  });
-  const clients = clientsData?.clients ?? [];
-
   // Prevent closing the drawer mid-save
   useClickOutside(panelRef, isSubmitting ? () => {} : onClose);
+
+  const issueDate = watch("issueDate");
+  const dueDate = watch("dueDate");
+
+  const diffDays =
+    issueDate && dueDate
+      ? differenceInCalendarDays(parseISO(dueDate), parseISO(issueDate))
+      : 14;
+
+  const activeTerm = [0, 7, 14, 30].includes(diffDays)
+    ? String(diffDays)
+    : "custom";
+
+  function handleTermChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const val = e.target.value;
+    if (val === "custom") return;
+    const days = Number(val);
+    if (!issueDate) return;
+    const nextDue = format(addDays(parseISO(issueDate), days), "yyyy-MM-dd");
+    setValue("dueDate", nextDue, { shouldValidate: true });
+  }
+
+  function handleIssueDateChange(newIssueDate: string) {
+    setValue("issueDate", newIssueDate, { shouldValidate: true });
+    if (activeTerm !== "custom") {
+      const days = Number(activeTerm);
+      const nextDue = format(
+        addDays(parseISO(newIssueDate), days),
+        "yyyy-MM-dd",
+      );
+      setValue("dueDate", nextDue, { shouldValidate: true });
+    } else if (dueDate && dueDate < newIssueDate) {
+      setValue("dueDate", newIssueDate, { shouldValidate: true });
+    }
+  }
 
   const subtotal = items.reduce((sum, item) => {
     const quantity = Number(item.quantity) || 0;
     const unitPrice = Number(item.unitPrice) || 0;
     return sum + quantity * unitPrice;
   }, 0);
+  const taxRateValue = Math.min(Math.max(Number(taxRate) || 0, 0), 100);
+  const tax = (subtotal * taxRateValue) / 100;
+  const total = subtotal + tax;
 
   const label =
     mode === "edit"
@@ -98,59 +136,94 @@ export function InvoiceFormDrawer({
           noValidate
           aria-busy={isSubmitting}
           className="mt-12 space-y-12">
-          {/* Business identity is managed in onboarding/settings. */}
           <FormSection title="Bill From">
             <BillFrom />
           </FormSection>
 
           <FormSection title="Bill To">
-            <SelectField
-              label="Client"
-              error={errors.clientId?.message}
-              disabled={isLoadingClients || clients.length === 0}
-              {...register("clientId")}>
-              <option value="">
-                {isLoadingClients
-                  ? "Loading clients…"
-                  : clients.length
-                    ? "Select a client"
-                    : "No clients yet — add one first"}
-              </option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.company
-                    ? `${client.name} — ${client.company}`
-                    : client.name}
-                </option>
-              ))}
-            </SelectField>
-
-            {clients.length === 0 && !isLoadingClients && (
-              <p className="text-[13px] font-medium text-muted-light">
-                Create a client first, then come back to invoice them.
-              </p>
-            )}
+            <Controller
+              control={control}
+              name="clientId"
+              render={({ field, fieldState }) => (
+                <ClientPicker
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  selectedClient={existingInvoice?.client ?? null}
+                  error={fieldState.error?.message}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
           </FormSection>
 
           <FormSection title="Invoice Details">
             <div className="grid gap-6 sm:grid-cols-2">
-              <TextField
-                label="Invoice Date"
-                type="date"
-                error={errors.issueDate?.message}
-                {...register("issueDate")}
+              <Controller
+                control={control}
+                name="issueDate"
+                render={({ field, fieldState }) => (
+                  <DatePickerField
+                    label="Invoice Date"
+                    name={field.name}
+                    value={field.value ?? ""}
+                    onChange={handleIssueDateChange}
+                    onBlur={field.onBlur}
+                    disabled={isSubmitting}
+                    error={fieldState.error?.message}
+                    align="start"
+                  />
+                )}
+              />
+              <SelectField
+                label="Payment Terms"
+                value={activeTerm}
+                onChange={handleTermChange}
+                disabled={isSubmitting}>
+                <option value="0">Due on Receipt (Net 0)</option>
+                <option value="7">Net 7 Days</option>
+                <option value="14">Net 14 Days</option>
+                <option value="30">Net 30 Days</option>
+                {activeTerm === "custom" && (
+                  <option value="custom">
+                    Custom {diffDays > 0 ? `(${diffDays} days)` : ""}
+                  </option>
+                )}
+              </SelectField>
+              <Controller
+                control={control}
+                name="dueDate"
+                render={({ field, fieldState }) => (
+                  <DatePickerField
+                    label="Due Date"
+                    name={field.name}
+                    value={field.value ?? ""}
+                    min={issueDate}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    disabled={isSubmitting}
+                    error={fieldState.error?.message}
+                    align="start"
+                  />
+                )}
               />
               <TextField
-                label="Due Date"
-                type="date"
-                error={errors.dueDate?.message}
-                {...register("dueDate")}
+                label="Tax Rate (%)"
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                max="100"
+                placeholder="0"
+                error={errors.taxRate?.message}
+                disabled={isSubmitting}
+                {...register("taxRate")}
               />
             </div>
             <TextAreaField
               label="Project Description"
               placeholder="Graphic Design"
               error={errors.notes?.message}
+              disabled={isSubmitting}
               {...register("notes")}
             />
           </FormSection>
@@ -163,7 +236,7 @@ export function InvoiceFormDrawer({
               {fields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,.6fr)_minmax(0,1fr)_auto] items-start gap-2 sm:gap-3">
+                  className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,.6fr)_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3">
                   <TextField
                     label={index === 0 ? "Item Name" : ""}
                     placeholder="Banner Design"
@@ -184,7 +257,7 @@ export function InvoiceFormDrawer({
                     type="number"
                     inputMode="decimal"
                     step="0.01"
-                    min="0"
+                    min="0.01"
                     error={errors.items?.[index]?.unitPrice?.message}
                     {...register(`items.${index}.unitPrice`)}
                   />
@@ -205,11 +278,27 @@ export function InvoiceFormDrawer({
 
             <AddNewItemButton className="mt-5" onClick={appendItem} />
 
-            <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-[15px] font-bold">
-              <span className="text-muted">Total</span>
-              <span className="text-ink">
-                {formatMoney(subtotal, branding.currency)}
-              </span>
+            <div className="mt-6 space-y-2 border-t border-border pt-4 text-[15px] font-bold">
+              <div className="flex items-center justify-between">
+                <span className="text-muted">Subtotal</span>
+                <span className="text-ink">
+                  {formatMoney(subtotal, branding.currency)}
+                </span>
+              </div>
+              {taxRateValue > 0 && (
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted">Tax ({taxRateValue}%)</span>
+                  <span className="text-ink">
+                    {formatMoney(tax, branding.currency)}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between border-t border-border pt-2">
+                <span className="text-muted">Total</span>
+                <span className="text-ink">
+                  {formatMoney(total, branding.currency)}
+                </span>
+              </div>
             </div>
             <p className="mt-1 text-[13px] font-medium text-muted-light">
               Totals are recalculated on the server when saved.
