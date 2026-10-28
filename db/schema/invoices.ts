@@ -53,8 +53,11 @@ export const invoices = pgTable(
     dueDate: date("due_date").notNull(),
     currency: text("currency").default("GBP").notNull(),
 
-    // Server-computed only — never populated from client input.
+    // Server-computed only. Never populated from client input.
     subtotal: money("subtotal").default("0"),
+    taxRate: numeric("tax_rate", { precision: 5, scale: 2 })
+      .default("0")
+      .notNull(),
     tax: money("tax").default("0"),
     discount: money("discount").default("0"),
     total: money("total").default("0"),
@@ -102,6 +105,10 @@ export const invoices = pgTable(
     check(
       "invoices_amounts_non_negative",
       sql`${table.subtotal} >= 0 AND ${table.tax} >= 0 AND ${table.discount} >= 0 AND ${table.total} >= 0`,
+    ),
+    check(
+      "invoices_tax_rate_range",
+      sql`${table.taxRate} >= 0 AND ${table.taxRate} <= 100`,
     ),
   ],
 );
