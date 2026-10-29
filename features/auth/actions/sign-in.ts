@@ -2,15 +2,13 @@
 
 import { auth } from "../lib/server";
 import { signInSchema } from "../schemas/validation";
-import { redirect } from "next/navigation";
 
 /**
  * Validates credentials and signs the user in with email/password.
- * Redirects to the dashboard on success.
  *
  * @param _prevState - Unused previous state, kept for the action signature.
  * @param formData - Submitted form data containing `email` and `password`.
- * @returns An error state on invalid input or failed sign-in; otherwise never returns (redirects).
+ * @returns An error state on invalid input or failed sign-in; otherwise `null` on success.
  */
 export async function signInWithEmail(
   _prevState: { error: string } | null,
@@ -28,5 +26,5 @@ export async function signInWithEmail(
   const { error } = await auth.signIn.email(parsed.data);
   if (error) return { error: error.message || "Failed to sign in. Try again." };
 
-  redirect("/dashboard");
+  return null;
 }

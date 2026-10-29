@@ -1,7 +1,8 @@
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { unstable_rethrow } from "next/navigation";
+import { useRouter, unstable_rethrow } from "next/navigation";
+import { toast } from "react-hot-toast";
 import {
   verifyEmailSchema,
   type VerifyEmailValues,
@@ -16,6 +17,7 @@ import { toFormData } from "../lib/form-data";
 const RESEND_COOLDOWN_SECONDS = 45;
 
 export function useVerifyEmail({ email }: { email?: string }) {
+  const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -38,7 +40,13 @@ export function useVerifyEmail({ email }: { email?: string }) {
     startTransition(async () => {
       try {
         const result = await verifyEmailWithOtp(null, toFormData(data));
-        if (result?.error) setSubmitError(result.error);
+        if (result?.error) {
+          setSubmitError(result.error);
+          return;
+        }
+        toast.success("Email verified successfully!");
+        router.push("/onboarding");
+        router.refresh();
       } catch (e) {
         unstable_rethrow(e);
         setSubmitError(mapOtpError(e));
@@ -54,7 +62,10 @@ export function useVerifyEmail({ email }: { email?: string }) {
           toFormData({ email: form.getValues("email") }),
         );
         setSendError(result?.error ?? null);
-        if (!result?.error) setCooldown(RESEND_COOLDOWN_SECONDS);
+        if (!result?.error) {
+          setCooldown(RESEND_COOLDOWN_SECONDS);
+          toast.success("Verification code sent!");
+        }
       } catch (e) {
         unstable_rethrow(e);
         setSendError(mapOtpError(e));

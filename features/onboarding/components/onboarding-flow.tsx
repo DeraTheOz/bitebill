@@ -1,65 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import {
-  FormProvider,
-  useForm,
-  type FieldPath,
-  type Resolver,
-} from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { FormProvider } from "react-hook-form";
 import {
   ArrowLeft,
   ArrowRight,
-  Building2,
   Check,
   LoaderCircle,
-  MapPin,
-  Palette,
   Sparkles,
 } from "lucide-react";
-import { toast } from "react-hot-toast";
 import { MotionProvider } from "@/components/motion-provider";
 import { signOut } from "@/features/auth/actions/sign-out";
 import { ThemeToggle } from "@/features/theme/components/theme-toggle";
-import { DEFAULT_BRAND_COLOR } from "../lib/brand-colors";
-import { finishOnboarding } from "../lib/finish-onboarding";
-import {
-  onboardingSchema,
-  stepSchemas,
-  type OnboardingValues,
-} from "../schemas/onboarding-schema";
+import { useOnboardingFlow } from "../hooks/use-onboarding-flow";
 import { InvoicePreview } from "./invoice-preview";
 import { StepIndicator } from "./step-indicator";
 import { AddressStep } from "./steps/address-step";
 import { BrandingStep } from "./steps/branding-step";
 import { BusinessStep } from "./steps/business-step";
-
-const steps = [
-  { label: "Business", icon: Building2 },
-  { label: "Address", icon: MapPin },
-  { label: "Branding", icon: Palette },
-] as const;
-
-const stepByField: Record<string, number> = {
-  businessName: 0,
-  businessEmail: 0,
-  businessPhone: 0,
-  website: 0,
-  addressLine1: 1,
-  addressLine2: 1,
-  city: 1,
-  state: 1,
-  country: 1,
-  logoUrl: 2,
-  brandColor: 2,
-  currency: 2,
-  invoicePrefix: 2,
-  pdfTemplate: 2,
-  defaultTerms: 2,
-};
 
 const stepVariants = {
   enter: (direction: number) => ({
@@ -84,106 +42,27 @@ type OnboardingFlowProps = {
 };
 
 export function OnboardingFlow({ user }: OnboardingFlowProps) {
-  const router = useRouter();
-  const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const [isFinishing, setIsFinishing] = useState(false);
-  const cardRef = useRef<HTMLFormElement>(null);
-  const isFirstRender = useRef(true);
-
-  const methods = useForm<OnboardingValues>({
-    resolver: zodResolver(
-      stepSchemas[step],
-    ) as unknown as Resolver<OnboardingValues>,
-    defaultValues: {
-      businessName: "",
-      businessEmail: user.email,
-      businessPhone: "",
-      website: "",
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      country: "",
-      logoUrl: "",
-      brandColor: DEFAULT_BRAND_COLOR,
-      currency: "USD",
-      invoicePrefix: "BB",
-      pdfTemplate: "classic",
-      defaultTerms: "",
-    },
-    mode: "onTouched",
-  });
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [step]);
-
-  const goNext = async () => {
-    const valid = await methods.trigger(undefined, { shouldFocus: true });
-    if (!valid) return;
-    setDirection(1);
-    setStep((current) => Math.min(current + 1, steps.length - 1));
-  };
-
-  const goBack = () => {
-    if (isFinishing) return;
-    setDirection(-1);
-    setStep((current) => Math.max(current - 1, 0));
-  };
-
-  const goToStep = (target: number) => {
-    if (isFinishing || target >= step) return;
-    setDirection(-1);
-    setStep(target);
-  };
-
-  const onSubmit = async () => {
-    if (isFinishing) return;
-    const parsed = onboardingSchema.safeParse(methods.getValues());
-
-    if (!parsed.success) {
-      parsed.error.issues.forEach((issue) => {
-        methods.setError(issue.path.join(".") as FieldPath<OnboardingValues>, {
-          message: issue.message,
-        });
-      });
-      const targetStep = parsed.error.issues.reduce(
-        (earliest, issue) =>
-          Math.min(earliest, stepByField[String(issue.path[0])] ?? 0),
-        steps.length - 1,
-      );
-      setDirection(-1);
-      setStep(targetStep);
-      return;
-    }
-
-    setIsFinishing(true);
-    try {
-      await finishOnboarding(parsed.data);
-      router.push("/dashboard");
-      // Drop any cached pre-onboarding RSC payload (e.g. an earlier
-      // redirect back to /onboarding).
-      router.refresh();
-    } catch {
-      toast.error("We couldn't save your setup. Please try again.");
-    } finally {
-      setIsFinishing(false);
-    }
-  };
-
-  const firstName = user.name.trim().split(/\s+/)[0] ?? "";
-  const isLastStep = step === steps.length - 1;
+  const {
+    methods,
+    step,
+    direction,
+    isFinishing,
+    isNavigating,
+    cardRef,
+    firstName,
+    isLastStep,
+    steps,
+    goNext,
+    goBack,
+    goToStep,
+    onSubmit,
+  } = useOnboardingFlow({ user });
 
   return (
     <MotionProvider>
       <FormProvider {...methods}>
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6 md:pt-32 lg:pt-12 xl:pt-16">
-          <div className="mb-4 flex items-center justify-end gap-4">
+        <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
+          <div className="mb-10 flex items-center justify-end gap-4">
             <ThemeToggle className="grid size-10 place-items-center" />
             <form action={signOut}>
               <button
@@ -272,7 +151,7 @@ export function OnboardingFlow({ user }: OnboardingFlowProps) {
                           className="size-4 animate-spin"
                           aria-hidden="true"
                         />
-                        Saving…
+                        {isNavigating ? "Redirecting…" : "Saving…"}
                       </>
                     ) : (
                       <>

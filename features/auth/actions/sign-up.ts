@@ -3,15 +3,13 @@
 import { auth } from "../lib/server";
 import { signUpSchema } from "../schemas/validation";
 import { generateAvatar } from "@/lib/avatar";
-import { redirect } from "next/navigation";
 
 /**
  * Validates the submitted details and creates a new email/password account.
- * Redirects to the email-verification page on success.
  *
  * @param _prevState - Unused previous state, kept for the action signature.
  * @param formData - Submitted form data containing `name`, `email` and `password`.
- * @returns An error state on invalid input or failed registration; otherwise never returns (redirects).
+ * @returns An error state on invalid input or failed registration; otherwise `null` on success.
  */
 export async function signUpWithEmail(
   _prevState: { error: string } | null,
@@ -33,5 +31,5 @@ export async function signUpWithEmail(
   });
   if (error) return { error: error.message || "Failed to create account" };
 
-  redirect(`/auth/verify-email?email=${encodeURIComponent(parsed.data.email)}`);
+  return null;
 }
