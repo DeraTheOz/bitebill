@@ -3,7 +3,6 @@
 import { auth } from "../lib/server";
 import { sendOtpSchema, verifyEmailSchema } from "../schemas/validation";
 import { mapOtpError } from "../lib/otp-error";
-import { redirect } from "next/navigation";
 
 /**
  * Result returned by the email OTP server actions.
@@ -40,11 +39,10 @@ export async function sendVerificationOtp(
 
 /**
  * Validates the submitted email and OTP, then verifies the account.
- * Redirects to onboarding on success.
  *
  * @param _prevState - Unused previous state, kept for the action signature.
  * @param formData - Submitted form data containing `email` and `otp`.
- * @returns An error state on invalid input or failed verification; otherwise never returns (redirects).
+ * @returns An error state on invalid input or failed verification; otherwise `null` on success.
  */
 export async function verifyEmailWithOtp(
   _prevState: OtpActionState,
@@ -66,5 +64,5 @@ export async function verifyEmailWithOtp(
 
   if (error) return { error: mapOtpError(error) };
 
-  redirect("/onboarding");
+  return null;
 }

@@ -1,7 +1,8 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { unstable_rethrow } from "next/navigation";
+import { useRouter, unstable_rethrow } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { signInSchema, type SignInValues } from "../schemas/validation";
 import { signInWithEmail } from "../actions/sign-in";
 import { toFormData } from "../lib/form-data";
@@ -9,6 +10,7 @@ import { toFormData } from "../lib/form-data";
 const FALLBACK_MESSAGE = "Something went wrong. Please try again.";
 
 export function useSignIn() {
+  const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -22,7 +24,13 @@ export function useSignIn() {
     startTransition(async () => {
       try {
         const result = await signInWithEmail(null, toFormData(data));
-        if (result?.error) setSubmitError(result.error);
+        if (result?.error) {
+          setSubmitError(result.error);
+          return;
+        }
+        toast.success("Welcome back!");
+        router.push("/dashboard");
+        router.refresh();
       } catch (e) {
         unstable_rethrow(e);
         setSubmitError(FALLBACK_MESSAGE);
