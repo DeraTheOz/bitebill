@@ -1,7 +1,7 @@
 import type { ComponentPropsWithRef } from "react";
 
 type TextFieldProps = ComponentPropsWithRef<"input"> & {
-  label: string;
+  label?: string;
   error?: string;
 };
 
@@ -16,9 +16,11 @@ export function TextField({
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={inputId} className="text-[13px] font-medium text-muted">
-        {label}
-      </label>
+      {Boolean(label) && (
+        <label htmlFor={inputId} className="text-[13px] font-medium text-muted">
+          {label}
+        </label>
+      )}
       <input
         {...props}
         id={inputId}
@@ -27,7 +29,11 @@ export function TextField({
           error ? "border-danger" : "border-border"
         } ${className}`}
       />
-      {error && <p className="text-[13px] font-medium text-danger">{error}</p>}
+      {error && (
+        <p className="text-[12px] font-medium leading-tight text-danger sm:text-[13px]">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
