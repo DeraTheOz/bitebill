@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { InvoiceList } from "./invoice-list";
 import { InvoiceListSkeleton } from "./invoice-list-skeleton";
 import {
@@ -108,12 +109,14 @@ export function InvoiceWorkspace() {
         )}
       </section>
 
-      {isCreateOpen && (
-        <InvoiceFormDrawer
-          mode="create"
-          onClose={() => setIsCreateOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isCreateOpen && (
+          <InvoiceFormDrawer
+            mode="create"
+            onClose={() => setIsCreateOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 }
