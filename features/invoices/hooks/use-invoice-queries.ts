@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { clientKeys } from "@/features/clients/hooks/use-client-queries";
+import { dashboardKeys } from "@/features/dashboard/hooks/use-dashboard-queries";
 import { invoicesApi, type InvoiceListRequest } from "../lib/api";
 import type {
   InvoiceFormValues,
@@ -52,6 +53,7 @@ export function useCreateInvoice() {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.all });
       // Client invoice counts/metrics derive from invoices.
       queryClient.invalidateQueries({ queryKey: clientKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
     },
   });
 }
@@ -72,6 +74,7 @@ export function useUpdateInvoice() {
     onSuccess: (invoice) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.all });
       queryClient.invalidateQueries({ queryKey: clientKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
       queryClient.setQueryData(invoiceKeys.detail(invoice.id), invoice);
     },
   });
@@ -85,6 +88,7 @@ export function useDeleteInvoice() {
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.all });
       queryClient.invalidateQueries({ queryKey: clientKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
       queryClient.removeQueries({ queryKey: invoiceKeys.detail(id) });
     },
   });
@@ -98,6 +102,7 @@ export function useMarkInvoicePaid() {
     onSuccess: (invoice) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.all });
       queryClient.invalidateQueries({ queryKey: clientKeys.all });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
       queryClient.setQueryData(invoiceKeys.detail(invoice.id), invoice);
     },
   });

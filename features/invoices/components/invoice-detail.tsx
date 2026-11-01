@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence } from "motion/react";
 import toast from "react-hot-toast";
 import { ChevronLeft } from "lucide-react";
 import { InvoiceStatusBadge } from "./invoice-status";
@@ -200,13 +201,15 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
         />
       </div>
 
-      {isEditOpen && (
-        <InvoiceFormDrawer
-          mode="edit"
-          invoiceId={invoice.id}
-          onClose={() => setIsEditOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isEditOpen && (
+          <InvoiceFormDrawer
+            mode="edit"
+            invoiceId={invoice.id}
+            onClose={() => setIsEditOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {isDeleteOpen && (
         <DeleteInvoiceDialog

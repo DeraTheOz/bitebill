@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { ClientList } from "./client-list";
 import { ClientListSkeleton } from "./client-list-skeleton";
 import { ClientEmptyState, ClientNoResultsState } from "./client-empty-state";
@@ -105,12 +106,14 @@ export function ClientWorkspace() {
         )}
       </section>
 
-      {isCreateOpen && (
-        <ClientFormDrawer
-          mode="create"
-          onClose={() => setIsCreateOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isCreateOpen && (
+          <ClientFormDrawer
+            mode="create"
+            onClose={() => setIsCreateOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 }

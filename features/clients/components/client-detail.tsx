@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { AnimatePresence } from "motion/react";
 import {
   ChevronLeft,
   CircleCheck,
@@ -207,13 +208,15 @@ export function ClientDetail({ clientId }: { clientId: string }) {
         </div>
       </div>
 
-      {isEditOpen && (
-        <ClientFormDrawer
-          mode="edit"
-          clientId={client.id}
-          onClose={() => setIsEditOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isEditOpen && (
+          <ClientFormDrawer
+            mode="edit"
+            clientId={client.id}
+            onClose={() => setIsEditOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {isDeleteOpen && (
         <DeleteClientDialog

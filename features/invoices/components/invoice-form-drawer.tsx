@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Controller } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
+import { motion } from "motion/react";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { TextField } from "@/components/forms/text-field";
 import { SelectField } from "@/components/forms/select-field";
@@ -113,30 +114,44 @@ export function InvoiceFormDrawer({
   const canSend = mode === "edit" && existingInvoice?.status !== "paid";
 
   return (
-    <div className="fixed inset-x-0 bottom-0 top-18 z-40 bg-black/50 md:top-20 lg:inset-y-0 lg:left-64">
-      <aside
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !isSubmitting) onClose();
+      }}
+      className="fixed inset-x-0 bottom-0 top-18 z-40 overflow-hidden bg-black/50 md:top-20 lg:inset-y-0 lg:left-64">
+      <motion.aside
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={label}
-        className="scrollbar-purple absolute inset-0 w-full overflow-y-auto bg-surface px-6 pb-24 pt-8 shadow-2xl dark:bg-canvas md:w-154 md:rounded-r-[20px] md:px-14 md:pb-28 md:pt-12 lg:right-auto lg:pt-14">
-        {mode === "create" ? (
-          <h1 className="text-[24px] text-ink font-bold tracking-[-0.75px]">
-            New Invoice
-          </h1>
-        ) : (
-          <h1 className="text-[24px] text-ink font-bold tracking-[-0.75px]">
-            Edit <span className="text-muted-light">#</span>
-            {existingInvoice?.invoiceNumber ?? invoiceId}
-          </h1>
-        )}
-
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "-100%" }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute inset-y-0 left-0 flex w-full flex-col bg-surface shadow-2xl dark:bg-canvas md:w-154 md:rounded-r-[20px]">
         <form
           onSubmit={handleSubmit(onSubmit)}
           noValidate
           aria-busy={isSubmitting}
-          className="mt-12 space-y-12">
-          <FormSection title="Bill From">
+          className="flex h-full flex-col overflow-hidden">
+          <div className="scrollbar-purple flex-1 overflow-y-auto px-6 pb-8 pt-8 md:px-14 md:pt-12 lg:pt-14">
+            {mode === "create" ? (
+              <h1 className="text-[24px] text-ink font-bold tracking-[-0.75px]">
+                New Invoice
+              </h1>
+            ) : (
+              <h1 className="text-[24px] text-ink font-bold tracking-[-0.75px]">
+                Edit <span className="text-muted-light">#</span>
+                {existingInvoice?.invoiceNumber ?? invoiceId}
+              </h1>
+            )}
+
+            <div className="mt-12 space-y-12">
+              <FormSection title="Bill From">
             <BillFrom />
           </FormSection>
 
@@ -232,19 +247,26 @@ export function InvoiceFormDrawer({
             <h2 className="text-[18px] font-bold text-muted-light">
               Item List
             </h2>
-            <div className="mt-4 space-y-4">
+
+            {/* Column Headers */}
+            <div className="mt-4 grid grid-cols-[minmax(0,1.6fr)_minmax(0,.6fr)_minmax(0,1fr)_auto] gap-2 text-[13px] font-medium text-muted sm:gap-3">
+              <span>Item Name</span>
+              <span>Qty.</span>
+              <span>Price</span>
+              <span className="w-9" aria-hidden="true" />
+            </div>
+
+            <div className="mt-2 space-y-3">
               {fields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,.6fr)_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3">
+                  className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,.6fr)_minmax(0,1fr)_auto] items-start gap-2 sm:gap-3">
                   <TextField
-                    label={index === 0 ? "Item Name" : ""}
                     placeholder="Banner Design"
                     error={errors.items?.[index]?.name?.message}
                     {...register(`items.${index}.name`)}
                   />
                   <TextField
-                    label={index === 0 ? "Qty." : ""}
                     type="number"
                     inputMode="decimal"
                     step="any"
@@ -253,7 +275,6 @@ export function InvoiceFormDrawer({
                     {...register(`items.${index}.quantity`)}
                   />
                   <TextField
-                    label={index === 0 ? "Price" : ""}
                     type="number"
                     inputMode="decimal"
                     step="0.01"
@@ -261,11 +282,12 @@ export function InvoiceFormDrawer({
                     error={errors.items?.[index]?.unitPrice?.message}
                     {...register(`items.${index}.unitPrice`)}
                   />
-                  <RemoveItemButton
-                    className="mt-7"
-                    onClick={() => removeItem(index)}
-                    disabled={fields.length === 1}
-                  />
+                  <div className="flex h-12 w-9 items-center justify-center">
+                    <RemoveItemButton
+                      onClick={() => removeItem(index)}
+                      disabled={fields.length === 1}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -305,7 +327,10 @@ export function InvoiceFormDrawer({
             </p>
           </section>
 
-          <footer className="fixed inset-x-0 bottom-0 flex flex-wrap justify-end gap-2 border-t border-border bg-surface px-6 py-4 dark:bg-canvas md:right-auto md:w-154 md:px-14 lg:left-64">
+            </div>
+          </div>
+
+          <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-border bg-surface px-6 py-4 dark:bg-canvas md:px-14 md:rounded-br-[20px]">
             {mode === "create" && (
               <DiscardButton
                 className="mr-auto disabled:cursor-not-allowed disabled:opacity-60"
@@ -388,7 +413,7 @@ export function InvoiceFormDrawer({
             )}
           </footer>
         </form>
-      </aside>
-    </div>
+      </motion.aside>
+    </motion.div>
   );
 }
