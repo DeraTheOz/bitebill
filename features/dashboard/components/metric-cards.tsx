@@ -47,7 +47,7 @@ export function MetricCards({ metrics }: { metrics: DashboardMetrics }) {
         return (
           <div
             key={card.label}
-            className="flex flex-col justify-between rounded-xl border border-transparent bg-surface p-5 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] transition-colors dark:shadow-none">
+            className="flex flex-col justify-between rounded-xl border border-transparent bg-surface p-4 sm:p-5 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] transition-colors dark:shadow-none">
             <div className="flex items-center justify-between gap-3">
               <span className="text-[13px] font-medium tracking-[-0.1px] text-muted-light">
                 {card.label}

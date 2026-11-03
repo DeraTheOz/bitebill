@@ -22,10 +22,10 @@ export function DashboardWorkspace() {
   const { data, isPending, isError, refetch } = useDashboard();
 
   return (
-    <main className="px-6 pb-14 pt-26 md:px-10 md:pt-30 lg:px-12 lg:pt-16">
+    <main className="px-4 pb-12 pt-24 sm:px-6 md:px-8 md:pt-28 lg:px-8 lg:pt-14">
       <div className="mx-auto w-full max-w-6xl">
         {/* Header */}
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-x-4 gap-y-6 md:mb-10">
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-5 md:mb-8">
           <div>
             <h1 className="text-[32px] font-bold leading-none tracking-[-1.125px] text-ink sm:text-[36px]">
               Dashboard
