@@ -107,3 +107,20 @@ export function useMarkInvoicePaid() {
     },
   });
 }
+
+export function useDownloadInvoicePdf() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      invoiceNumber,
+    }: {
+      id: string;
+      invoiceNumber: string;
+    }) => invoicesApi.downloadPdf(id, invoiceNumber),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(id) });
+    },
+  });
+}

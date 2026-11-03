@@ -114,4 +114,24 @@ export const invoicesApi = {
     );
     return invoice;
   },
+
+  downloadPdf: async (id: string, invoiceNumber: string) => {
+    const response = await fetch(`/api/invoices/${id}/pdf`);
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      throw new ApiError(
+        errorBody?.error ?? "Failed to download PDF",
+        response.status,
+      );
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${invoiceNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  },
 };

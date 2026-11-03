@@ -16,6 +16,7 @@ import { Line } from "./invoice-line";
 import { Actions } from "./invoice-actions";
 import {
   useDeleteInvoice,
+  useDownloadInvoicePdf,
   useMarkInvoicePaid,
 } from "../hooks/use-invoice-queries";
 import { formatDate, formatMoney } from "@/lib/format";
@@ -28,9 +29,11 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
 
   const deleteInvoice = useDeleteInvoice();
   const markPaid = useMarkInvoicePaid();
+  const downloadPdf = useDownloadInvoicePdf();
 
   const isDeleting = deleteInvoice.isPending;
   const isMarkingPaid = markPaid.isPending;
+  const isDownloadingPdf = downloadPdf.isPending;
   const isPaid = invoice.status === "paid";
 
   const client = invoice.client;
@@ -51,6 +54,16 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
     });
   }
 
+  function handleDownloadPdf() {
+    downloadPdf.mutate(
+      { id: invoice.id, invoiceNumber: invoice.invoiceNumber },
+      {
+        onSuccess: () => toast.success("Invoice PDF downloaded"),
+        onError: (error) => toast.error(error.message),
+      },
+    );
+  }
+
   function handleDelete() {
     deleteInvoice.mutate(invoice.id, {
       onSuccess: () => {
@@ -62,7 +75,10 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   }
 
   return (
-    <main className="px-6 pb-26 pt-26 md:pb-14 md:pl-[calc((100%-688px)/2)] md:pr-[calc((100%-688px)/2)] md:pt-27.75 lg:pl-[calc((100%-730px)/2)] lg:pr-[calc((100%-730px)/2)] lg:pt-16.25 max-[970px]:md:px-10">
+    <main
+      className={`px-6 pt-26 md:pb-14 md:pl-[calc((100%-688px)/2)] md:pr-[calc((100%-688px)/2)] md:pt-27.75 lg:pl-[calc((100%-730px)/2)] lg:pr-[calc((100%-730px)/2)] lg:pt-16.25 max-[970px]:md:px-10 ${
+        !isPaid ? "pb-38" : "pb-28"
+      }`}>
       <section className="mx-auto w-full max-w-182.5">
         <Link
           href="/invoices"
@@ -81,9 +97,11 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
             onEdit={() => setIsEditOpen(true)}
             onDelete={() => setIsDeleteOpen(true)}
             onPaid={handleMarkPaid}
+            onDownloadPdf={handleDownloadPdf}
             showPaid={!isPaid}
             isMarkingPaid={isMarkingPaid}
             isDeletePending={isDeleting}
+            isDownloadingPdf={isDownloadingPdf}
           />
         </div>
 
@@ -130,9 +148,9 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
 
           <div className="mt-10 overflow-hidden rounded-lg">
             <div className="bg-surface-subtle p-6 md:p-8">
-              <div className="hidden grid-cols-[1.6fr_.5fr_.9fr_.9fr] text-[13px] text-muted md:grid">
+              <div className="hidden grid-cols-[1.4fr_.7fr_1fr_1.1fr] text-[13px] text-muted md:grid">
                 <span>Item Name</span>
-                <span>QTY.</span>
+                <span>Quantity</span>
                 <span className="text-right">Price</span>
                 <span className="text-right">Total</span>
               </div>
@@ -141,35 +159,35 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
                 <Line
                   key={item.id}
                   name={item.name}
-                  qty={String(item.quantity)}
+                  quantity={String(item.quantity)}
                   unitPrice={formatMoney(item.unitPrice, invoice.currency)}
                   total={formatMoney(item.total, invoice.currency)}
                 />
               ))}
 
               <div className="mt-8 space-y-2 border-t border-border pt-4 text-[13px] font-medium text-muted md:mt-10">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span className="font-bold text-ink">
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                  <span className="shrink-0">Subtotal</span>
+                  <span className="font-bold text-ink text-right wrap-break-word">
                     {formatMoney(invoice.subtotal, invoice.currency)}
                   </span>
                 </div>
                 {invoice.discount > 0 && (
-                  <div className="flex justify-between">
-                    <span>Discount</span>
-                    <span className="font-bold text-ink">
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                    <span className="shrink-0">Discount</span>
+                    <span className="font-bold text-ink text-right wrap-break-word">
                       −{formatMoney(invoice.discount, invoice.currency)}
                     </span>
                   </div>
                 )}
                 {invoice.tax > 0 && (
-                  <div className="flex justify-between">
-                    <span>
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                    <span className="shrink-0">
                       {invoice.taxRate > 0
                         ? `Tax (${invoice.taxRate}%)`
                         : "Tax"}
                     </span>
-                    <span className="font-bold text-ink">
+                    <span className="font-bold text-ink text-right wrap-break-word">
                       {formatMoney(invoice.tax, invoice.currency)}
                     </span>
                   </div>
@@ -177,9 +195,11 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
               </div>
             </div>
 
-            <div className="flex justify-between bg-sidebar px-6 py-6 text-white dark:bg-deep md:px-8">
-              <span className="text-[13px]">Amount Due</span>
-              <strong className="text-[24px] tracking-[-0.5px]">
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 bg-sidebar px-6 py-6 text-white dark:bg-deep md:px-8">
+              <span className="text-[13px] text-muted-light sm:text-white shrink-0">
+                Amount Due
+              </span>
+              <strong className="text-[20px] sm:text-[24px] tracking-[-0.5px] wrap-break-word text-right flex-1 sm:flex-initial">
                 {formatMoney(invoice.total, invoice.currency)}
               </strong>
             </div>
@@ -189,15 +209,16 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
         <InvoiceActivity events={invoice.events} />
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 bg-surface px-6 py-5 shadow-[0_-10px_20px_rgba(var(--shadow-navy),0.08)] md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-20 bg-surface px-4 py-3.5 shadow-[0_-10px_20px_rgba(var(--shadow-navy),0.08)] md:hidden">
         <Actions
-          className="flex justify-center"
           onEdit={() => setIsEditOpen(true)}
           onDelete={() => setIsDeleteOpen(true)}
           onPaid={handleMarkPaid}
+          onDownloadPdf={handleDownloadPdf}
           showPaid={!isPaid}
           isMarkingPaid={isMarkingPaid}
           isDeletePending={isDeleting}
+          isDownloadingPdf={isDownloadingPdf}
         />
       </div>
 

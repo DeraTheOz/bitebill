@@ -1,4 +1,5 @@
 import type { ClientAddress } from "@/features/clients/types/client";
+import type { PdfTemplate } from "@/features/branding/types/branding";
 
 export type StoredInvoiceStatus = "draft" | "pending" | "paid";
 
@@ -59,6 +60,7 @@ export type Invoice = {
   discount: number;
   total: number;
   publicNotes: string | null;
+  pdfTemplate?: PdfTemplate;
   paidAt: string | null;
   createdAt: string;
   updatedAt: string;

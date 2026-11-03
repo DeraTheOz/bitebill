@@ -16,6 +16,7 @@ import type { SQL } from "drizzle-orm";
 import { db } from "@/db/client";
 import { clients, invoiceEvents, invoiceItems, invoices } from "@/db/schema";
 import { getBrandingSettings } from "@/features/branding/services/branding";
+import type { PdfTemplate } from "@/features/branding/types/branding";
 import type {
   InvoiceFormValues,
   InvoiceItemValues,
@@ -161,6 +162,7 @@ function toInvoiceDto(
     discount: Number(row.discount),
     total: Number(row.total),
     publicNotes: row.publicNotes,
+    pdfTemplate: (row.pdfTemplate as PdfTemplate) ?? "classic",
     paidAt: row.paidAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -579,4 +581,19 @@ export async function deleteInvoice(
   ]);
 
   return deleted[0].length > 0;
+}
+
+export async function logInvoiceDownloadEvent(
+  userId: string,
+  invoiceId: string,
+  invoiceNumber: string,
+): Promise<void> {
+  await db.insert(invoiceEvents).values(
+    eventValues(
+      invoiceId,
+      userId,
+      "downloaded",
+      `Invoice ${invoiceNumber} downloaded as PDF`,
+    ),
+  );
 }
