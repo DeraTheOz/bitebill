@@ -73,7 +73,7 @@ export function InvoiceMockup() {
                 Item
               </th>
               <th scope="col" className="pb-2.5 text-right font-bold">
-                Qty
+                Quantity
               </th>
               <th scope="col" className="pb-2.5 text-right font-bold">
                 Amount
@@ -87,7 +87,7 @@ export function InvoiceMockup() {
                   {item.name}
                 </td>
                 <td className="py-3 text-right text-[15px] font-medium text-muted">
-                  {item.qty}
+                  {item.quantity}
                 </td>
                 <td className="py-3 text-right text-[15px] font-bold text-ink">
                   {usd(item.amount)}
