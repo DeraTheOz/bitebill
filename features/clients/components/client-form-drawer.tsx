@@ -168,45 +168,47 @@ export function ClientFormDrawer({
             </div>
           </div>
 
-          <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-border bg-surface px-6 py-4 dark:bg-canvas md:px-14 md:rounded-br-[20px]">
+          <footer className="border-t border-border bg-surface px-4 py-3.5 dark:bg-canvas md:px-14 md:py-4 md:rounded-br-[20px]">
             {mode === "create" ? (
-              <>
+              <div className="grid grid-cols-2 md:flex md:items-center md:justify-end gap-2 w-full">
                 <DiscardButton
-                  className="mr-auto disabled:cursor-not-allowed disabled:opacity-60"
+                  type="button"
+                  className="w-full md:w-auto md:mr-auto disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={onClose}
                   disabled={isSubmitting}
                 />
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`bg-button-purple text-white hover:bg-button-purple-light ${pendingButtonClassName}`}>
+                  className={`w-full md:w-auto bg-button-purple text-white hover:bg-button-purple-light ${pendingButtonClassName}`}>
                   {isSubmitting && (
-                    <Spinner className="size-4" tone="currentColor" />
+                    <Spinner className="size-4 shrink-0" tone="currentColor" />
                   )}
-                  {isSubmitting ? "Adding…" : "Add Client"}
+                  <span>{isSubmitting ? "Adding…" : "Add Client"}</span>
                 </Button>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="grid grid-cols-2 md:flex md:items-center md:justify-end gap-2 w-full">
                 <CancelButton
+                  type="button"
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full md:w-auto md:mr-auto disabled:cursor-not-allowed disabled:opacity-60"
                 />
                 <SaveChangesButton
                   type="submit"
                   disabled={isSubmitting}
-                  className={`inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60`}>
+                  className={`w-full md:w-auto ${pendingButtonClassName}`}>
                   {isSubmitting ? (
                     <>
-                      <Spinner className="size-4" tone="currentColor" />
-                      Saving…
+                      <Spinner className="size-4 shrink-0" tone="currentColor" />
+                      <span>Saving…</span>
                     </>
                   ) : (
                     "Save Changes"
                   )}
                 </SaveChangesButton>
-              </>
+              </div>
             )}
           </footer>
         </form>

@@ -198,7 +198,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-20 bg-surface px-6 py-5 shadow-[0_-10px_20px_rgba(var(--shadow-navy),0.08)] md:hidden">
-        <div className="flex justify-center gap">
+        <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
           <EditButton onClick={() => setIsEditOpen(true)} />
           <DeleteButton
             onClick={() => setIsDeleteOpen(true)}
