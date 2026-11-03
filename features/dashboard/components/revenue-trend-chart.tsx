@@ -39,7 +39,7 @@ export function RevenueTrendChart({
 
   return (
     <div
-      className={`flex h-full flex-col justify-between rounded-xl border border-transparent bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] transition-colors dark:shadow-none ${className}`}>
+      className={`flex h-full flex-col justify-between rounded-xl border border-transparent bg-surface p-4 sm:p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] transition-colors dark:shadow-none ${className}`}>
       {/* Header */}
       <div>
         {/* Total revenue trend */}
@@ -76,7 +76,7 @@ export function RevenueTrendChart({
             </p>
           </div>
 
-          <div className="flex w-full items-center justify-between gap-1 rounded-xl bg-surface-subtle p-1 shadow-xs sm:w-auto sm:justify-start sm:gap-1.5 sm:p-1.5">
+          <div className="flex w-full max-w-full items-center gap-1 overflow-x-auto no-scrollbar rounded-xl bg-surface-subtle p-1 shadow-xs sm:w-auto sm:justify-start sm:gap-1.5 sm:p-1.5">
             {(["total", "paid", "pending", "overdue"] as const).map((key) => {
               const isSelected = activeMetric === key;
               const config = metricConfig[key];
@@ -85,7 +85,7 @@ export function RevenueTrendChart({
                   key={key}
                   type="button"
                   onClick={() => setActiveMetric(key)}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[12px] font-bold capitalize transition-all sm:flex-initial sm:gap-2 sm:px-3.5 sm:text-[13px] ${
+                  className={`flex flex-1 min-w-0 items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-bold capitalize whitespace-nowrap transition-all sm:flex-initial sm:gap-2 sm:px-3.5 sm:py-2 sm:text-[13px] ${
                     isSelected
                       ? "bg-surface text-ink shadow-[0_2px_8px_rgba(var(--shadow-navy),0.08)] dark:bg-sidebar-border dark:text-white"
                       : "text-muted hover:bg-surface/50 hover:text-ink dark:hover:bg-sidebar-border/50"
@@ -108,7 +108,7 @@ export function RevenueTrendChart({
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={trends}
-              margin={{ top: 14, right: 6, left: -14, bottom: 0 }}>
+              margin={{ top: 14, right: 6, left: -6, bottom: 0 }}>
               <defs>
                 <linearGradient
                   id={activeConfig.gradientId}
@@ -142,12 +142,14 @@ export function RevenueTrendChart({
                 axisLine={false}
                 tick={{ fill: "currentColor", fontSize: 12, fontWeight: 700 }}
                 className="text-muted-light"
-                padding={{ left: 14, right: 14 }}
+                padding={{ left: 4, right: 4 }}
               />
 
               <YAxis
+                width={34}
                 tickLine={false}
                 axisLine={false}
+                tickMargin={4}
                 tick={{ fill: "currentColor", fontSize: 11, fontWeight: 500 }}
                 className="text-muted"
                 tickFormatter={(val: number) => {

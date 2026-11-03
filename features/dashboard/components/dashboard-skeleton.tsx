@@ -6,7 +6,7 @@ export function DashboardSkeleton() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-32 rounded-xl bg-surface p-5 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
+            className="h-32 rounded-xl bg-surface p-4 sm:p-5 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
             <div className="flex justify-between items-center">
               <div className="h-4 w-24 rounded bg-surface-subtle" />
               <div className="size-9 rounded-lg bg-surface-subtle" />
@@ -19,7 +19,7 @@ export function DashboardSkeleton() {
 
       {/* Middle Row: Trend Chart & Status Breakdown */}
       <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
-        <div className="h-100 rounded-xl bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] lg:col-span-2 dark:shadow-none">
+        <div className="h-100 rounded-xl bg-surface p-4 sm:p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] lg:col-span-2 dark:shadow-none">
           <div className="h-5 w-40 rounded bg-surface-subtle" />
           <div className="mt-3 flex justify-between items-center">
             <div className="h-9 w-44 rounded bg-surface-subtle" />
@@ -28,7 +28,7 @@ export function DashboardSkeleton() {
           <div className="mt-8 h-64 rounded-lg bg-surface-subtle" />
         </div>
 
-        <div className="h-100 rounded-xl bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
+        <div className="h-100 rounded-xl bg-surface p-4 sm:p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
           <div className="flex justify-between items-center">
             <div className="h-5 w-36 rounded bg-surface-subtle" />
             <div className="h-4 w-20 rounded bg-surface-subtle" />
@@ -49,7 +49,7 @@ export function DashboardSkeleton() {
 
       {/* Bottom Row: Recent Invoices & Activity */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="h-80 rounded-xl bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
+        <div className="h-80 rounded-xl bg-surface p-4 sm:p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
           <div className="h-5 w-36 rounded bg-surface-subtle" />
           <div className="mt-6 space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -58,7 +58,7 @@ export function DashboardSkeleton() {
           </div>
         </div>
 
-        <div className="h-80 rounded-xl bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
+        <div className="h-80 rounded-xl bg-surface p-4 sm:p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none">
           <div className="h-5 w-36 rounded bg-surface-subtle" />
           <div className="mt-6 space-y-4">
             {[1, 2, 3, 4].map((i) => (

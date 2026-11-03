@@ -22,7 +22,7 @@ export function DashboardActivity({
   activities: DashboardActivityItem[];
 }) {
   return (
-    <div className="flex flex-col rounded-xl border border-transparent bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] transition-colors dark:shadow-none">
+    <div className="flex flex-col rounded-xl border border-transparent bg-surface p-4 sm:p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] transition-colors dark:shadow-none">
       <div className="flex items-center gap-2">
         <h2 className="text-[16px] font-bold tracking-[-0.2px] text-ink">
           Recent Activity

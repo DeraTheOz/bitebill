@@ -1,26 +1,33 @@
 export function Line({
   name,
-  qty,
+  quantity,
   unitPrice,
   total,
 }: {
   name: string;
-  qty: string;
+  quantity: string;
   unitPrice: string;
   total: string;
 }) {
   return (
-    <div className="mt-7 grid grid-cols-[1fr_auto] items-center text-[15px] text-muted font-bold md:grid-cols-[1.6fr_.5fr_.9fr_.9fr]">
-      <span className="text-ink">
-        {name}
-        <small className="mt-2 block text-[15px] font-bold text-muted md:hidden">
-          {qty} x {unitPrice}
-        </small>
-      </span>
+    <div className="mt-5 flex flex-col gap-1.5 border-b border-border/40 pb-5 text-[15px] font-bold text-muted last:border-b-0 last:pb-0 md:mt-7 md:grid md:grid-cols-[1.4fr_.7fr_1fr_1.1fr] md:items-center md:gap-0 md:border-b-0 md:pb-0">
+      {/* Item Name */}
+      <span className="text-ink wrap-break-word font-bold">{name}</span>
 
-      <span className="hidden md:block">{qty}</span>
+      {/* Mobile Meta Row: Quantity x Price and Total */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[13px] md:hidden">
+        <span className="font-bold text-muted">
+          {quantity} × {unitPrice}
+        </span>
+        <span className="font-bold text-ink text-right wrap-break-word">
+          {total}
+        </span>
+      </div>
+
+      {/* Desktop Columns */}
+      <span className="hidden md:block">{quantity}</span>
       <span className="hidden text-right md:block">{unitPrice}</span>
-      <span className="text-right text-ink">{total}</span>
+      <span className="hidden text-right text-ink md:block">{total}</span>
     </div>
   );
 }
