@@ -6,9 +6,10 @@ import { useFormContext } from "react-hook-form";
 import { Palette, Upload, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { ColorSelectField } from "@/components/forms/color-select-field";
-import { SelectField } from "@/components/forms/select-field";
+import { CurrencySelectField } from "@/components/forms/currency-select-field";
 import { TextAreaField } from "@/components/forms/text-area-field";
 import { TextField } from "@/components/forms/text-field";
+import { CURRENCIES } from "@/lib/currencies";
 import {
   brandColors,
   lightenHex,
@@ -16,21 +17,6 @@ import {
 } from "../../lib/brand-colors";
 import type { OnboardingValues } from "../../schemas/onboarding-schema";
 import { StepHeader } from "../step-header";
-
-const currencies = [
-  { code: "USD", symbol: "$" },
-  { code: "EUR", symbol: "€" },
-  { code: "GBP", symbol: "£" },
-  { code: "CAD", symbol: "C$" },
-  { code: "AUD", symbol: "A$" },
-  { code: "INR", symbol: "₹" },
-  { code: "NGN", symbol: "₦" },
-  { code: "JPY", symbol: "¥" },
-  { code: "GHS", symbol: "₵" },
-  { code: "KES", symbol: "KSh" },
-  { code: "EGP", symbol: "E£" },
-  { code: "ZAR", symbol: "R" },
-];
 
 const templates = [
   { value: "classic", label: "Classic", description: "Timeless, minimal" },
@@ -48,6 +34,7 @@ export function BrandingStep() {
 
   const logoUrl = watch("logoUrl");
   const brandColor = watch("brandColor");
+  const currency = watch("currency") || "USD";
   const prefix = watch("invoicePrefix") || "BB";
 
   const handleLogoChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -81,34 +68,32 @@ export function BrandingStep() {
 
       <div className="mt-6 flex flex-col gap-7">
         <div className="flex flex-wrap items-center gap-4">
-          <span
-            className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-border"
-            style={{ backgroundColor: brandColor }}>
-            {logoUrl ? (
-              <Image
+          {logoUrl ? (
+            <span className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface p-1.5 shadow-xs">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={logoUrl}
                 alt="Your logo preview"
-                width={64}
-                height={64}
-                unoptimized
-                className="relative size-16 object-contain p-1.5"
+                className="max-h-full max-w-full object-contain"
               />
-            ) : (
-              <>
-                <span
-                  className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-xl mask-[url('/assets/logo-bg.svg')] mask-repeat:no-repeat mask-size-[100%_100%]"
-                  style={{ backgroundColor: lightenHex(brandColor) }}
-                />
-                <Image
-                  src="/assets/logo-white.svg"
-                  width={26}
-                  height={26}
-                  alt=""
-                  className="relative"
-                />
-              </>
-            )}
-          </span>
+            </span>
+          ) : (
+            <span
+              className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-border"
+              style={{ backgroundColor: brandColor }}>
+              <span
+                className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-xl mask-[url('/assets/logo-bg.svg')] mask-repeat:no-repeat mask-size-[100%_100%]"
+                style={{ backgroundColor: lightenHex(brandColor) }}
+              />
+              <Image
+                src="/assets/logo-white.svg"
+                width={26}
+                height={26}
+                alt=""
+                className="relative"
+              />
+            </span>
+          )}
 
           <div className="flex flex-col gap-2">
             <label
@@ -141,27 +126,33 @@ export function BrandingStep() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <SelectField
+          <CurrencySelectField
             label="Currency"
             id="currency"
+            name="currency"
+            currencies={CURRENCIES}
+            value={currency}
             error={errors.currency?.message}
-            {...register("currency")}>
-            {currencies.map((currency) => (
-              <option key={currency.code} value={currency.code}>
-                {currency.code} ({currency.symbol})
-              </option>
-            ))}
-          </SelectField>
+            onChange={(code) =>
+              setValue("currency", code, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
 
           <ColorSelectField
             label="Brand color"
             id="brand-color"
+            name="brandColor"
             colors={brandColors}
             value={brandColor}
+            align="right"
             error={errors.brandColor?.message}
-            onChange={(event) =>
-              setValue("brandColor", event.currentTarget.value, {
+            onChange={(color) =>
+              setValue("brandColor", color, {
                 shouldDirty: true,
+                shouldValidate: true,
               })
             }
           />

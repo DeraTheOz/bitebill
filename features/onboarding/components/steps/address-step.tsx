@@ -2,15 +2,40 @@
 
 import { MapPin } from "lucide-react";
 import { useFormContext } from "react-hook-form";
+import { CountrySelectField } from "@/components/forms/country-select-field";
 import { TextField } from "@/components/forms/text-field";
+import { getCurrencyForCountry } from "@/lib/countries";
 import type { OnboardingValues } from "../../schemas/onboarding-schema";
 import { StepHeader } from "../step-header";
 
 export function AddressStep() {
   const {
     register,
+    watch,
+    setValue,
+    getFieldState,
     formState: { errors },
   } = useFormContext<OnboardingValues>();
+
+  const country = watch("country") ?? "";
+
+  const handleCountryChange = (selectedCountry: string) => {
+    setValue("country", selectedCountry, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    const currencyState = getFieldState("currency");
+    if (!currencyState.isDirty) {
+      const suggestedCurrency = getCurrencyForCountry(selectedCountry);
+      if (suggestedCurrency) {
+        setValue("currency", suggestedCurrency, {
+          shouldDirty: false,
+          shouldValidate: true,
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -62,14 +87,13 @@ export function AddressStep() {
             {...register("state")}
           />
 
-          <TextField
+          <CountrySelectField
             label="Country"
             id="country"
-            type="text"
-            autoComplete="country-name"
-            placeholder="United States"
+            name="country"
+            value={country}
             error={errors.country?.message}
-            {...register("country")}
+            onChange={handleCountryChange}
           />
         </div>
       </div>
