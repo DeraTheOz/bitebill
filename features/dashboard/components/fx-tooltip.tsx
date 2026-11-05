@@ -69,17 +69,18 @@ export function FxTooltip({
               {formatMoney(data.pending, currency)}
             </span>
           </div>
-          {data.overdue > 0 && (
-            <div className="flex justify-between gap-4 text-muted-light">
-              <span className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-danger" />
-                Overdue
-              </span>
-              <span className="font-semibold text-danger-light">
-                {formatMoney(data.overdue, currency)}
-              </span>
-            </div>
-          )}
+          <div className="flex justify-between gap-4 text-muted-light">
+            <span className="flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-danger" />
+              Overdue
+            </span>
+            <span
+              className={`font-semibold ${
+                data.overdue > 0 ? "text-danger-light" : "text-white"
+              }`}>
+              {formatMoney(data.overdue, currency)}
+            </span>
+          </div>
         </div>
       )}
     </div>

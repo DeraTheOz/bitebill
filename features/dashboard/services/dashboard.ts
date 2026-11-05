@@ -31,7 +31,10 @@ function computeStatus(
   return rowStatus;
 }
 
-export async function getDashboardData(userId: string): Promise<DashboardData> {
+export async function getDashboardData(
+  userId: string,
+  period = "6m",
+): Promise<DashboardData> {
   const branding = await getBrandingSettings(userId);
   const currency = branding?.currency ?? "USD";
 
@@ -118,20 +121,47 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       totalInvoices > 0 ? Math.round((item.count / totalInvoices) * 100) : 0,
   }));
 
-  // 4. Monthly Revenue Trends (Rolling 6 months from real DB invoices)
+  // 4. Monthly Revenue Trends
   const now = new Date();
+  const currentYear = now.getUTCFullYear();
+  const invoiceYears = allInvoices
+    .map((inv) => new Date(inv.issueDate).getUTCFullYear())
+    .filter((y) => !Number.isNaN(y));
+  const availableYears = Array.from(
+    new Set([currentYear, ...invoiceYears]),
+  ).sort((a, b) => b - a);
+
+  const parsedYear = Number(period);
+  const isYearMode =
+    !Number.isNaN(parsedYear) && parsedYear >= 2000 && parsedYear <= 2100;
+
   const months: { label: string; year: number; yearMonth: string }[] = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1),
-    );
-    const label = d.toLocaleDateString("en-US", {
-      month: "short",
-      timeZone: "UTC",
-    });
-    const year = d.getUTCFullYear();
-    const yearMonth = `${year}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
-    months.push({ label, year, yearMonth });
+
+  if (isYearMode) {
+    // Generate all 12 calendar months for the selected year (Jan - Dec)
+    for (let m = 0; m < 12; m++) {
+      const d = new Date(Date.UTC(parsedYear, m, 1));
+      const label = d.toLocaleDateString("en-US", {
+        month: "short",
+        timeZone: "UTC",
+      });
+      const yearMonth = `${parsedYear}-${String(m + 1).padStart(2, "0")}`;
+      months.push({ label, year: parsedYear, yearMonth });
+    }
+  } else {
+    // Default: Rolling 6 months
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1),
+      );
+      const label = d.toLocaleDateString("en-US", {
+        month: "short",
+        timeZone: "UTC",
+      });
+      const year = d.getUTCFullYear();
+      const yearMonth = `${year}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+      months.push({ label, year, yearMonth });
+    }
   }
 
   const monthlyTrends: MonthlyRevenueTrend[] = months.map(
@@ -226,5 +256,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     statusDistribution,
     recentInvoices,
     recentActivity,
+    availableYears,
+    period: isYearMode ? String(parsedYear) : "6m",
   };
 }

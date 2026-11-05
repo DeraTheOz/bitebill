@@ -48,5 +48,7 @@ export type DashboardData = {
   statusDistribution: StatusDistributionItem[];
   recentInvoices: InvoiceListItem[];
   recentActivity: DashboardActivityItem[];
+  availableYears: number[];
+  period: string;
 };
 
