@@ -4,11 +4,12 @@ export const invoiceItemSchema = z.object({
   name: z.string().trim().min(1, "Enter an item name").max(200),
   quantity: z.coerce
     .number()
-    .min(0, "Quantity can't be negative")
+    .int("Quantity must be a whole number")
+    .min(1, "Quantity must be at least 1")
     .max(999_999),
   unitPrice: z.coerce
     .number()
-    .positive("Price must be greater than 0")
+    .min(0.01, "Price must be at least 0.01")
     .max(9_999_999),
 });
 
@@ -21,6 +22,11 @@ export const invoiceFormBaseSchema = z.object({
     .number()
     .min(0, "Tax can't be negative")
     .max(100, "Tax can't exceed 100%")
+    .refine((val) => {
+      if (!Number.isFinite(val)) return false;
+      const parts = val.toString().split(".");
+      return parts.length < 2 || parts[1].length <= 2;
+    }, "Tax rate can have at most 2 decimal places")
     .default(0),
   items: z
     .array(invoiceItemSchema)
@@ -58,6 +64,8 @@ export const updateInvoiceInputSchema = invoiceFormBaseSchema
     path: ["dueDate"],
     message: "Due date can't be before the invoice date",
   });
+
+export type InvoiceFormInput = z.input<typeof invoiceFormSchema>;
 
 export type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
 
