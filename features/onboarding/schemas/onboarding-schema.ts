@@ -2,15 +2,17 @@ import z from "zod";
 import {
   brandingLogoUrlSchema,
   brandingSettingsSchema,
+  businessPhoneSchema,
 } from "@/features/branding/schemas/branding-schema";
 
 export const businessSchema = z.object({
   businessName: z
     .string()
     .trim()
-    .min(2, "Business name must be at least 2 characters"),
+    .min(2, "Business name must be at least 2 characters")
+    .regex(/^[\p{L}\s]+$/u, "Business name must contain only letters"),
   businessEmail: z.email("Enter a valid email"),
-  businessPhone: z.string().trim().min(7, "Enter a valid phone number"),
+  businessPhone: businessPhoneSchema,
   website: z.union([
     z.literal(""),
     z.url("Enter a valid URL, e.g. https://yoursite.com"),
@@ -20,16 +22,30 @@ export const businessSchema = z.object({
 export const addressSchema = z.object({
   addressLine1: z.string().trim().min(3, "Street address is required"),
   addressLine2: z.string().trim(),
-  city: z.string().trim().min(1, "City is required"),
-  state: z.string().trim().min(1, "State or region is required"),
-  country: z.string().trim().min(1, "Country is required"),
+  city: z
+    .string()
+    .trim()
+    .min(2, "City is required")
+    .regex(
+      /^[\p{L}]{2,}(?:[\s\-][\p{L}]{2,})*$/u,
+      "Enter a valid city name (letters only)",
+    ),
+  state: z
+    .string()
+    .trim()
+    .min(2, "State or region is required")
+    .regex(
+      /^[\p{L}]{2,}(?:[\s\-][\p{L}]{2,})*$/u,
+      "Enter a valid state or region (letters only)",
+    ),
+  country: z.string().trim().min(1, "Select a country"),
 });
 
 export const brandingSchema = z.object({
   logoUrl: brandingLogoUrlSchema,
   brandColor: z
     .string()
-    .regex(/^#[0-9a-fA-F]{6}$/, "Pick a color from the list"),
+    .regex(/^#[0-9a-fA-F]{6}$/, "Enter a valid hex color code (e.g. #7C5DFA)"),
   currency: z
     .string()
     .regex(/^[A-Z]{3}$/, "Choose a 3-letter currency code"),

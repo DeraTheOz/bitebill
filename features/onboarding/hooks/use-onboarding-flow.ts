@@ -44,6 +44,19 @@ export const STEP_BY_FIELD: Record<string, number> = {
   defaultTerms: 2,
 };
 
+export const STEP_FIELDS: Record<number, readonly FieldPath<OnboardingValues>[]> = {
+  0: ["businessName", "businessEmail", "businessPhone", "website"],
+  1: ["addressLine1", "addressLine2", "city", "state", "country"],
+  2: [
+    "logoUrl",
+    "brandColor",
+    "currency",
+    "invoicePrefix",
+    "pdfTemplate",
+    "defaultTerms",
+  ],
+};
+
 type UseOnboardingFlowOptions = {
   user: {
     name: string;
@@ -80,10 +93,19 @@ export function useOnboardingFlow({
 
   const isFinishing = isSaving || isNavigating;
 
+  const stepRef = useRef(step);
+
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
   const methods = useForm<OnboardingValues>({
-    resolver: zodResolver(
-      stepSchemas[step],
-    ) as unknown as Resolver<OnboardingValues>,
+    resolver: async (values, context, options) => {
+      const currentSchema = stepSchemas[stepRef.current];
+      return (
+        zodResolver(currentSchema) as unknown as Resolver<OnboardingValues>
+      )(values, context, options);
+    },
     defaultValues: {
       businessName: "",
       businessEmail: user.email,
@@ -113,7 +135,8 @@ export function useOnboardingFlow({
   }, [step]);
 
   const goNext = async () => {
-    const valid = await methods.trigger(undefined, { shouldFocus: true });
+    const fieldsToValidate = STEP_FIELDS[step];
+    const valid = await methods.trigger(fieldsToValidate, { shouldFocus: true });
     if (!valid) return;
     setDirection(1);
     setStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));

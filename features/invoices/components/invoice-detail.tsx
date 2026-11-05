@@ -180,13 +180,9 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
                     </span>
                   </div>
                 )}
-                {invoice.tax > 0 && (
+                {invoice.taxRate > 0 && (
                   <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                    <span className="shrink-0">
-                      {invoice.taxRate > 0
-                        ? `Tax (${invoice.taxRate}%)`
-                        : "Tax"}
-                    </span>
+                    <span className="shrink-0">Tax ({invoice.taxRate}%)</span>
                     <span className="font-bold text-ink text-right wrap-break-word">
                       {formatMoney(invoice.tax, invoice.currency)}
                     </span>

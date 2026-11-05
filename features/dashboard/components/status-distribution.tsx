@@ -6,6 +6,7 @@ import { useIsMounted } from "@/hooks/use-is-mounted";
 import { formatMoney } from "@/lib/format";
 import type { StatusDistributionItem } from "../types/dashboard";
 import { statusConfig } from "../lib/status-config";
+import { useStatusDistribution } from "../hooks/use-status-distribution";
 import { PieCustomTooltip } from "./pie-tooltip";
 
 export function StatusDistribution({
@@ -20,18 +21,8 @@ export function StatusDistribution({
   className?: string;
 }) {
   const isMounted = useIsMounted();
-
-  const emptyData = [
-    { name: "None", count: 1, fill: "var(--border)", fillOpacity: 0.3 },
-  ];
-
-  const chartData = items
-    .filter((item) => item.count > 0)
-    .map((item) => ({
-      ...item,
-      name: statusConfig[item.status].label,
-      fill: statusConfig[item.status].color,
-    }));
+  const { displayData, hasData, invoiceLabel, centerInvoiceLabel } =
+    useStatusDistribution(items, totalInvoices);
 
   return (
     <div
@@ -45,24 +36,24 @@ export function StatusDistribution({
           <PieChartIcon size={16} className="text-purple" />
         </div>
         <span className="text-[13px] font-bold text-muted-light">
-          {totalInvoices} {totalInvoices === 1 ? "invoice" : "invoices"}
+          {totalInvoices} {invoiceLabel}
         </span>
       </div>
 
       {/* Donut Chart */}
-      <div className="relative my-2 flex h-52 w-full items-center justify-center">
+      <div className="relative my-2 flex flex-1 min-h-60 sm:min-h-64 w-full items-center justify-center select-none outline-none **:outline-none">
         {isMounted ? (
           <>
             {/* Center Label (positioned behind chart & tooltip layer) */}
             <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-light">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-light">
                 Total
               </span>
-              <span className="text-2xl font-bold tracking-tight text-ink">
+              <span className="text-3xl font-bold tracking-tight text-ink">
                 {totalInvoices}
               </span>
-              <span className="text-[11px] font-semibold text-muted">
-                Invoices
+              <span className="text-[12px] font-semibold text-muted">
+                {centerInvoiceLabel}
               </span>
             </div>
 
@@ -70,18 +61,18 @@ export function StatusDistribution({
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={chartData.length > 0 ? chartData : emptyData}
+                    data={displayData}
                     dataKey="count"
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={74}
-                    paddingAngle={chartData.length > 1 ? 4 : 0}
-                    cornerRadius={4}
+                    innerRadius={70}
+                    outerRadius={102}
+                    paddingAngle={displayData.length > 1 ? 4 : 0}
+                    cornerRadius={5}
                     stroke="none"
                   />
-                  {chartData.length > 0 && (
+                  {hasData && (
                     <Tooltip
                       wrapperStyle={{ zIndex: 50, outline: "none" }}
                       content={<PieCustomTooltip currency={currency} />}
@@ -92,19 +83,19 @@ export function StatusDistribution({
             </div>
           </>
         ) : (
-          <div className="size-40 animate-pulse rounded-full bg-surface-subtle" />
+          <div className="size-48 animate-pulse rounded-full bg-surface-subtle" />
         )}
       </div>
 
       {/* Legend & Breakdown list */}
-      <div className="space-y-2 pt-2">
+      <div className="space-y-1.5 border-t border-border/40 pt-3">
         {items.map((item) => {
           const config = statusConfig[item.status];
 
           return (
             <div
               key={item.status}
-              className="flex items-center justify-between rounded-lg px-2 py-1 text-[13px] transition-colors hover:bg-surface-subtle/60">
+              className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] transition-colors hover:bg-surface-subtle/60">
               <div className="flex items-center gap-2.5">
                 <span
                   className={`size-2.5 shrink-0 rounded-full ${config.dot}`}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, useController, type Control } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { motion } from "motion/react";
 import { useClickOutside } from "@/hooks/use-click-outside";
@@ -23,9 +23,50 @@ import { ClientPicker } from "@/features/clients/components/client-picker";
 import { DatePickerField } from "@/components/forms/date-picker-field";
 import { formatMoney } from "@/lib/format";
 import { useInvoiceFormDrawer } from "../hooks/use-invoice-form-drawer";
+import { useTaxRateInput } from "../hooks/use-tax-rate-input";
+import type {
+  InvoiceFormInput,
+  InvoiceFormValues,
+} from "../schemas/invoice-schema";
 
 const pendingButtonClassName =
   "inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60";
+
+function TaxRateField({
+  control,
+  disabled,
+}: {
+  control: Control<InvoiceFormInput, unknown, InvoiceFormValues>;
+  disabled: boolean;
+}) {
+  const { field, fieldState } = useController({
+    control,
+    name: "taxRate",
+  });
+
+  const { displayValue, handleChange, handlePaste, handleBlur } =
+    useTaxRateInput({
+      value: field.value,
+      onChange: field.onChange,
+      onBlur: field.onBlur,
+    });
+
+  return (
+    <TextField
+      id="taxRate"
+      label="Tax Rate (%)"
+      type="text"
+      inputMode="decimal"
+      placeholder="0"
+      value={displayValue}
+      error={fieldState.error?.message}
+      disabled={disabled}
+      onChange={handleChange}
+      onPaste={handlePaste}
+      onBlur={handleBlur}
+    />
+  );
+}
 
 type InvoiceFormDrawerProps = {
   mode: "create" | "edit";
@@ -55,6 +96,7 @@ export function InvoiceFormDrawer({
     items,
     taxRate,
     submit,
+    discard,
     handleSubmit,
     onSubmit,
   } = useInvoiceFormDrawer(mode, onClose, invoiceId);
@@ -221,18 +263,7 @@ export function InvoiceFormDrawer({
                       />
                     )}
                   />
-                  <TextField
-                    label="Tax Rate (%)"
-                    type="number"
-                    inputMode="decimal"
-                    step="0.01"
-                    min="0"
-                    max="100"
-                    placeholder="0"
-                    error={errors.taxRate?.message}
-                    disabled={isSubmitting}
-                    {...register("taxRate")}
-                  />
+                  <TaxRateField control={control} disabled={isSubmitting} />
                 </div>
                 <TextAreaField
                   label="Project Description"
@@ -286,9 +317,9 @@ export function InvoiceFormDrawer({
                             <TextField
                               id={`items.${index}.quantity`}
                               type="number"
-                              inputMode="decimal"
-                              step="any"
-                              min="0"
+                              inputMode="numeric"
+                              step="1"
+                              min="1"
                               placeholder="1"
                               error={errors.items?.[index]?.quantity?.message}
                               {...register(`items.${index}.quantity`)}
@@ -390,7 +421,7 @@ export function InvoiceFormDrawer({
                 <div className="order-2 md:order-1 grid grid-cols-2 md:contents gap-2 w-full md:w-auto">
                   <DiscardButton
                     className="w-full md:w-auto md:mr-auto disabled:cursor-not-allowed disabled:opacity-60"
-                    onClick={onClose}
+                    onClick={discard}
                     disabled={isSubmitting}
                   />
 

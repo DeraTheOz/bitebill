@@ -44,7 +44,7 @@ export function BusinessStep() {
         />
 
         <TextField
-          label="Business phone"
+          label="Business phone (optional)"
           id="business-phone"
           type="tel"
           autoComplete="tel"

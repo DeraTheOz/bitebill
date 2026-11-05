@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { LandingUser } from "../lib/types";
 import { InvoiceMockup } from "./invoice-mockup";
@@ -21,8 +21,7 @@ export function Hero({ user }: { user: LandingUser | null }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex flex-col items-start gap-6 max-w-125 z-20">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-[13px] font-bold text-purple">
-            <Sparkles className="size-3.5" aria-hidden="true" />
+          <span className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-1.5 text-[13px] font-bold text-purple">
             Everything you need to invoice &amp; get paid
           </span>
 

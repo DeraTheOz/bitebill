@@ -18,8 +18,9 @@ import { DashboardSkeleton } from "./dashboard-skeleton";
 export function DashboardWorkspace() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreateClientOpen, setIsCreateClientOpen] = useState(false);
+  const [period, setPeriod] = useState<string>("6m");
   const branding = useBranding();
-  const { data, isPending, isError, refetch } = useDashboard();
+  const { data, isPending, isError, refetch } = useDashboard(period);
 
   return (
     <main className="px-4 pb-12 pt-24 sm:px-6 md:px-8 md:pt-28 lg:px-8 lg:pt-14">
@@ -81,6 +82,9 @@ export function DashboardWorkspace() {
                 <RevenueTrendChart
                   trends={data.monthlyTrends}
                   currency={data.metrics.currency}
+                  period={period}
+                  onPeriodChange={setPeriod}
+                  availableYears={data.availableYears}
                 />
               </div>
               <div className="flex flex-col lg:col-span-1">

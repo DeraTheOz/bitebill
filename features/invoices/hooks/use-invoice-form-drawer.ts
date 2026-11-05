@@ -1,11 +1,11 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addDays, format } from "date-fns";
-import type { z } from "zod";
 import {
   invoiceFormSchema,
+  type InvoiceFormInput,
   type InvoiceFormIntent,
   type InvoiceFormValues,
 } from "../schemas/invoice-schema";
@@ -14,11 +14,7 @@ import {
   useInvoice,
   useUpdateInvoice,
 } from "./use-invoice-queries";
-
-// Coerced fields (quantity, unitPrice) have `unknown` as their input
-// type; the form works with the raw input type and resolves to
-// InvoiceFormValues on submit.
-type InvoiceFormInput = z.input<typeof invoiceFormSchema>;
+import { useInvoiceDraftStore } from "../store/invoice-draft-store";
 
 const isoDate = (date: Date) => format(date, "yyyy-MM-dd");
 
@@ -45,6 +41,8 @@ export function useInvoiceFormDrawer(
     mode === "edit" ? (invoiceId ?? "") : "",
   );
 
+  const { draft, setDraft, clearDraft } = useInvoiceDraftStore();
+
   const defaults: InvoiceFormInput =
     mode === "edit" && existingInvoice
       ? {
@@ -60,7 +58,8 @@ export function useInvoiceFormDrawer(
             unitPrice: item.unitPrice,
           })),
         }
-      : createDefaults();
+      : // Restore a saved draft (create mode only) so accidental closes don't lose work.
+        (draft as InvoiceFormInput | null) ?? createDefaults();
 
   const {
     register,
@@ -88,6 +87,14 @@ export function useInvoiceFormDrawer(
   const items = useWatch({ control, name: "items" }) ?? [];
   const taxRate = useWatch({ control, name: "taxRate" }) ?? 0;
 
+  // Persist draft as the user types (create mode only). Skipped for edit
+  // because the server already holds the canonical values.
+  const allValues = useWatch({ control });
+  useEffect(() => {
+    if (mode !== "create") return;
+    setDraft(allValues as Partial<InvoiceFormInput>);
+  }, [mode, allValues, setDraft]);
+
   async function onSubmit(values: InvoiceFormValues) {
     const intent = intentRef.current;
 
@@ -105,6 +112,8 @@ export function useInvoiceFormDrawer(
           status: intent === "draft" ? "draft" : "pending",
         });
         toast.success(intent === "draft" ? "Draft saved" : "Invoice created");
+        // Clear the persisted draft now that it's been saved to the server.
+        clearDraft();
       }
       onClose();
     } catch (error) {
@@ -117,6 +126,12 @@ export function useInvoiceFormDrawer(
   function submit(intent: InvoiceFormIntent) {
     intentRef.current = intent;
     void handleSubmit(onSubmit)();
+  }
+
+  /** Called by the Discard button to intentionally wipe the draft. */
+  function discard() {
+    clearDraft();
+    onClose();
   }
 
   return {
@@ -133,7 +148,9 @@ export function useInvoiceFormDrawer(
     items,
     taxRate,
     submit,
+    discard,
     handleSubmit,
     onSubmit,
+    hasDraft: mode === "create" && draft !== null,
   };
 }

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useFormContext } from "react-hook-form";
-import { Sparkles } from "lucide-react";
 import { formatMoney } from "@/lib/format";
 import {
   DEFAULT_BRAND_COLOR,
@@ -43,8 +42,7 @@ export function InvoicePreview() {
   return (
     <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.15em] text-muted-light">
-          <Sparkles className="size-3.5 text-purple" aria-hidden="true" />
+        <p className="text-[13px] font-bold uppercase tracking-[0.15em] text-muted-light">
           Live preview
         </p>
         <span className="rounded-full bg-purple/10 px-3 py-1 text-[13px] font-bold text-purple">
@@ -70,42 +68,46 @@ export function InvoicePreview() {
                 : "border-b border-border"
           }`}>
           <div className="flex items-center gap-2.5">
-            <span
-              className="relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-br-xl"
-              style={{
-                backgroundColor: isModern
-                  ? "rgba(255,255,255,0.15)"
-                  : brandColor,
-              }}>
-              {values.logoUrl ? (
-                <Image
+            {values.logoUrl ? (
+              <span
+                className={`relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg ${
+                  isModern
+                    ? "bg-white/90 p-0.5 shadow-xs"
+                    : "border border-border/80 bg-surface p-0.5"
+                }`}>
+                {/* Plain img: data URIs do not benefit from the Next.js image optimizer */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={values.logoUrl}
                   alt=""
-                  width={36}
-                  height={36}
-                  unoptimized
-                  className="size-9 object-contain p-1"
+                  className="max-h-full max-w-full object-contain"
                 />
-              ) : (
-                <>
-                  <span
-                    className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-xl"
-                    style={{
-                      backgroundColor: isModern
-                        ? "rgba(255,255,255,0.14)"
-                        : lightenHex(brandColor),
-                    }}
-                  />
-                  <Image
-                    src="/assets/logo-white.svg"
-                    width={18}
-                    height={18}
-                    alt=""
-                    className="relative"
-                  />
-                </>
-              )}
-            </span>
+              </span>
+            ) : (
+              <span
+                className="relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-br-xl"
+                style={{
+                  backgroundColor: isModern
+                    ? "rgba(255,255,255,0.15)"
+                    : brandColor,
+                }}>
+                <span
+                  className="absolute bottom-0 left-0 h-1/2 w-full rounded-br-xl"
+                  style={{
+                    backgroundColor: isModern
+                      ? "rgba(255,255,255,0.14)"
+                      : lightenHex(brandColor),
+                  }}
+                />
+                <Image
+                  src="/assets/logo-white.svg"
+                  width={18}
+                  height={18}
+                  alt=""
+                  className="relative"
+                />
+              </span>
+            )}
             <div className="min-w-0">
               <p className="wrap-anywhere text-[15px] font-bold leading-tight">
                 {businessName}

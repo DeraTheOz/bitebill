@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   clientFormSchema,
@@ -10,6 +11,7 @@ import {
   useCreateClient,
   useUpdateClient,
 } from "./use-client-queries";
+import { useClientDraftStore } from "../store/client-draft-store";
 
 const defaultValues: ClientFormValues = {
   name: "",
@@ -33,8 +35,11 @@ export function useClientFormDrawer(
   const updateClient = useUpdateClient();
   const { data: existingClient } = useClient(clientId ?? "");
 
+  const { draft, setDraft, clearDraft } = useClientDraftStore();
+
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ClientFormValues>({
@@ -53,10 +58,18 @@ export function useClientFormDrawer(
             country: existingClient.address.country ?? "",
             notes: existingClient.notes ?? "",
           }
-        : defaultValues,
+        : // Restore persisted draft in create mode so accidental closes don't lose work.
+          (draft as ClientFormValues | null) ?? defaultValues,
   });
 
   const label = mode === "edit" ? "Edit client" : "New client";
+
+  // Persist draft as the user types (create mode only).
+  const allValues = useWatch({ control });
+  useEffect(() => {
+    if (mode !== "create") return;
+    setDraft(allValues as Partial<ClientFormValues>);
+  }, [mode, allValues, setDraft]);
 
   async function onSubmit(values: ClientFormValues) {
     try {
@@ -66,6 +79,8 @@ export function useClientFormDrawer(
       } else {
         await createClient.mutateAsync(values);
         toast.success("Client added");
+        // Clear the persisted draft now that it's been saved to the server.
+        clearDraft();
       }
       onClose();
     } catch (error) {
@@ -75,6 +90,12 @@ export function useClientFormDrawer(
     }
   }
 
+  /** Called by the Discard button to intentionally wipe the draft. */
+  function discard() {
+    clearDraft();
+    onClose();
+  }
+
   return {
     label,
     errors,
@@ -82,6 +103,8 @@ export function useClientFormDrawer(
     existingClient,
     register,
     onSubmit,
+    discard,
     handleSubmit,
+    hasDraft: mode === "create" && draft !== null,
   };
 }

@@ -29,6 +29,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const dashboardApi = {
-  get: () => request<DashboardData>("/api/dashboard"),
+  get: (period = "6m") =>
+    request<DashboardData>(`/api/dashboard?period=${encodeURIComponent(period)}`),
 };
 

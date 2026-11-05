@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Check,
   LoaderCircle,
-  Sparkles,
 } from "lucide-react";
 import { MotionProvider } from "@/components/motion-provider";
 import { signOut } from "@/features/auth/actions/sign-out";
@@ -73,8 +72,7 @@ export function OnboardingFlow({ user }: OnboardingFlowProps) {
             </form>
           </div>
           <header className="flex max-w-3xl flex-col items-start gap-4">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[13px] font-bold text-purple">
-              <Sparkles className="size-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-[13px] font-bold text-purple">
               Setting up your workspace
             </span>
             <h1 className="max-w-90 text-3xl font-bold tracking-[-0.5px] text-ink sm:text-4xl">
