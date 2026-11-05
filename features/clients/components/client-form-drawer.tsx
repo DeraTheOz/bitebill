@@ -36,6 +36,7 @@ export function ClientFormDrawer({
     existingClient,
     register,
     onSubmit,
+    discard,
     handleSubmit,
   } = useClientFormDrawer(mode, onClose, clientId);
 
@@ -174,7 +175,7 @@ export function ClientFormDrawer({
                 <DiscardButton
                   type="button"
                   className="w-full md:w-auto md:mr-auto disabled:cursor-not-allowed disabled:opacity-60"
-                  onClick={onClose}
+                  onClick={discard}
                   disabled={isSubmitting}
                 />
                 <Button
