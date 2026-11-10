@@ -60,6 +60,7 @@ export type Invoice = {
   discount: number;
   total: number;
   publicNotes: string | null;
+  internalNotes: string | null;
   pdfTemplate?: PdfTemplate;
   paidAt: string | null;
   createdAt: string;

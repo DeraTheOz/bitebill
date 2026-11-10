@@ -102,12 +102,19 @@ function searchFilter(q?: string) {
 }
 
 /** Stored status plus computed overdue, per the schema spec. */
-function toStatus(row: InvoiceRow): InvoiceStatus {
-  if (row.status !== "paid" && row.dueDate < today()) return "overdue";
-  return row.status;
+export function computeInvoiceStatus(
+  status: StoredInvoiceStatus,
+  dueDate: string,
+): InvoiceStatus {
+  if (status !== "paid" && dueDate < today()) return "overdue";
+  return status;
 }
 
-function toItemDto(row: InvoiceItemRow): InvoiceItem {
+function toStatus(row: InvoiceRow): InvoiceStatus {
+  return computeInvoiceStatus(row.status, row.dueDate);
+}
+
+export function toInvoiceItemDto(row: InvoiceItemRow): InvoiceItem {
   return {
     id: row.id,
     name: row.name,
@@ -162,12 +169,13 @@ function toInvoiceDto(
     discount: Number(row.discount),
     total: Number(row.total),
     publicNotes: row.publicNotes,
+    internalNotes: row.internalNotes,
     pdfTemplate: (row.pdfTemplate as PdfTemplate) ?? "classic",
     paidAt: row.paidAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     client: client ? toClientDto(client) : null,
-    items: items.map(toItemDto),
+    items: items.map(toInvoiceItemDto),
     events: events.map(toEventDto),
   };
 }
@@ -406,6 +414,7 @@ export async function createInvoice(
           discount: money(discount),
           total: money(total),
           publicNotes: input.values.notes || null,
+          internalNotes: input.values.internalNotes || null,
           createdBy: userId,
         }),
         db.insert(invoiceItems).values(
@@ -479,6 +488,7 @@ export async function updateInvoice(
         discount: money(discount),
         total: money(total),
         publicNotes: input.values.notes || null,
+        internalNotes: input.values.internalNotes || null,
         updatedBy: userId,
         updatedAt: new Date(),
       })
