@@ -1,7 +1,6 @@
 export type PdfTemplate = "classic" | "modern" | "corporate";
 
-export type BrandingSettings = {
-  id: string;
+export type PublicBranding = {
   businessName: string;
   businessEmail: string;
   businessPhone: string | null;
@@ -11,13 +10,17 @@ export type BrandingSettings = {
   city: string | null;
   state: string | null;
   country: string | null;
-  currency: string;
-  invoicePrefix: string;
   defaultTerms: string | null;
-  defaultPdfTemplate: PdfTemplate;
   brandColor: string;
   hasLogo: boolean;
   logoUpdatedAt: string | null;
+};
+
+export type BrandingSettings = PublicBranding & {
+  id: string;
+  currency: string;
+  invoicePrefix: string;
+  defaultPdfTemplate: PdfTemplate;
   createdAt: string;
   updatedAt: string;
 };

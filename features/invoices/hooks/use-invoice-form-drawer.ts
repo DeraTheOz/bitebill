@@ -25,6 +25,7 @@ function createDefaults(): InvoiceFormInput {
     issueDate: isoDate(now),
     dueDate: isoDate(addDays(now, 14)),
     notes: "",
+    internalNotes: "",
     taxRate: "",
     items: [{ name: "", quantity: 1, unitPrice: "" }],
   };
@@ -50,6 +51,7 @@ export function useInvoiceFormDrawer(
           issueDate: existingInvoice.issueDate,
           dueDate: existingInvoice.dueDate,
           notes: existingInvoice.publicNotes ?? "",
+          internalNotes: existingInvoice.internalNotes ?? "",
           taxRate:
             Number(existingInvoice.taxRate) > 0 ? existingInvoice.taxRate : "",
           items: existingInvoice.items.map((item) => ({
@@ -59,7 +61,9 @@ export function useInvoiceFormDrawer(
           })),
         }
       : // Restore a saved draft (create mode only) so accidental closes don't lose work.
-        (draft as InvoiceFormInput | null) ?? createDefaults();
+        draft
+        ? { ...createDefaults(), ...(draft as Partial<InvoiceFormInput>) }
+        : createDefaults();
 
   const {
     register,

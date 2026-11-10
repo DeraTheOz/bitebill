@@ -44,3 +44,24 @@ export async function generateInvoicePdf(
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
 }
+
+/**
+ * Wraps generated PDF bytes in a non-cacheable attachment download response.
+ */
+export function createPdfAttachmentResponse(
+  pdfBytes: Uint8Array,
+  invoiceNumber: string,
+): Response {
+  const safeName = invoiceNumber.replace(/[^A-Za-z0-9._-]/g, "_");
+  const filename = `${safeName}.pdf`;
+
+  return new Response(pdfBytes as unknown as BodyInit, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Length": String(pdfBytes.byteLength),
+      "Cache-Control": "private, no-cache, no-store, must-revalidate",
+    },
+  });
+}

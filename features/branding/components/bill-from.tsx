@@ -5,20 +5,33 @@ import {
   brandingLogoUrl,
   useBranding,
 } from "@/features/branding/components/branding-provider";
+import type { PublicBranding } from "@/features/branding/types/branding";
 
-export function BillFrom({
+type BillFromBusiness = Pick<
+  PublicBranding,
+  | "businessName"
+  | "businessEmail"
+  | "businessPhone"
+  | "website"
+  | "addressLine1"
+  | "addressLine2"
+  | "city"
+  | "state"
+  | "country"
+>;
+
+export function BillFromView({
+  branding,
+  logoUrl,
   align = "left",
   className = "",
 }: {
+  branding: BillFromBusiness;
+  logoUrl: string | null;
   align?: "left" | "right";
   className?: string;
 }) {
-  const branding = useBranding();
-  const logoUrl = brandingLogoUrl(branding);
-
-  const cityState = [branding.city, branding.state]
-    .filter(Boolean)
-    .join(", ");
+  const cityState = [branding.city, branding.state].filter(Boolean).join(", ");
 
   const lines = [
     branding.businessEmail,
@@ -60,5 +73,25 @@ export function BillFrom({
         </address>
       </div>
     </div>
+  );
+}
+
+export function BillFrom({
+  align = "left",
+  className = "",
+}: {
+  align?: "left" | "right";
+  className?: string;
+}) {
+  const branding = useBranding();
+  const logoUrl = brandingLogoUrl(branding);
+
+  return (
+    <BillFromView
+      branding={branding}
+      logoUrl={logoUrl}
+      align={align}
+      className={className}
+    />
   );
 }

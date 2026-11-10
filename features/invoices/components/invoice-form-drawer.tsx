@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Controller, useController, type Control } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { motion } from "motion/react";
 import { useClickOutside } from "@/hooks/use-click-outside";
@@ -23,50 +23,10 @@ import { ClientPicker } from "@/features/clients/components/client-picker";
 import { DatePickerField } from "@/components/forms/date-picker-field";
 import { formatMoney } from "@/lib/format";
 import { useInvoiceFormDrawer } from "../hooks/use-invoice-form-drawer";
-import { useTaxRateInput } from "../hooks/use-tax-rate-input";
-import type {
-  InvoiceFormInput,
-  InvoiceFormValues,
-} from "../schemas/invoice-schema";
+import { TaxRateField } from "./tax-rate-field";
 
 const pendingButtonClassName =
   "inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60";
-
-function TaxRateField({
-  control,
-  disabled,
-}: {
-  control: Control<InvoiceFormInput, unknown, InvoiceFormValues>;
-  disabled: boolean;
-}) {
-  const { field, fieldState } = useController({
-    control,
-    name: "taxRate",
-  });
-
-  const { displayValue, handleChange, handlePaste, handleBlur } =
-    useTaxRateInput({
-      value: field.value,
-      onChange: field.onChange,
-      onBlur: field.onBlur,
-    });
-
-  return (
-    <TextField
-      id="taxRate"
-      label="Tax Rate (%)"
-      type="text"
-      inputMode="decimal"
-      placeholder="0"
-      value={displayValue}
-      error={fieldState.error?.message}
-      disabled={disabled}
-      onChange={handleChange}
-      onPaste={handlePaste}
-      onBlur={handleBlur}
-    />
-  );
-}
 
 type InvoiceFormDrawerProps = {
   mode: "create" | "edit";
@@ -272,6 +232,18 @@ export function InvoiceFormDrawer({
                   disabled={isSubmitting}
                   {...register("notes")}
                 />
+                <div>
+                  <TextAreaField
+                    label="Internal Notes (Private)"
+                    placeholder="Private notes for your records…"
+                    error={errors.internalNotes?.message}
+                    disabled={isSubmitting}
+                    {...register("internalNotes")}
+                  />
+                  <p className="mt-1.5 text-[12px] font-medium text-muted-light">
+                    Only visible to you — never shown on PDFs or shared links.
+                  </p>
+                </div>
               </FormSection>
 
               <section>

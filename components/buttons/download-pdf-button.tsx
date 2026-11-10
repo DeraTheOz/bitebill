@@ -23,12 +23,14 @@ export function DownloadPdfButton({
       {isDownloading ? (
         <>
           <Spinner className="size-4 shrink-0" tone="currentColor" />
-          <span className="truncate">Generating...</span>
+          <span className="translate-y-[1.5px] truncate">Generating...</span>
         </>
       ) : (
         <>
           <Download className="size-4 text-muted shrink-0" aria-hidden="true" />
-          <span className="truncate">{children ?? "PDF"}</span>
+          <span className="translate-y-[1.5px] truncate">
+            {children ?? "PDF"}
+          </span>
         </>
       )}
     </button>

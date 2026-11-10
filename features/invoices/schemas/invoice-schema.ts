@@ -18,6 +18,12 @@ export const invoiceFormBaseSchema = z.object({
   issueDate: z.iso.date("Select an invoice date"),
   dueDate: z.iso.date("Select a due date"),
   notes: z.string().trim().max(2000, "Notes are too long"),
+  internalNotes: z
+    .string()
+    .trim()
+    .max(2000, "Internal notes are too long")
+    .optional()
+    .default(""),
   taxRate: z.coerce
     .number()
     .min(0, "Tax can't be negative")
