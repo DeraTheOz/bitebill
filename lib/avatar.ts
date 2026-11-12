@@ -76,6 +76,7 @@ const AVATAR_STYLES = [
   voxelBot,
 ];
 
+/** Picks a random DiceBear style configuration from the supported avatar sets. */
 function randomStyle() {
   return AVATAR_STYLES[Math.floor(Math.random() * AVATAR_STYLES.length)];
 }

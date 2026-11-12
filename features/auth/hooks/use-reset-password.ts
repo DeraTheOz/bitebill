@@ -13,6 +13,7 @@ import { toFormData } from "../lib/form-data";
 
 const RESEND_COOLDOWN_SECONDS = 45;
 
+/** Manages OTP password reset form state, resend cooldown timer, and submission. */
 export function useResetPassword({ email }: { email?: string }) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);

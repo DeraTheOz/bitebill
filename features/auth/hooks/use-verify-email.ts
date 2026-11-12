@@ -16,6 +16,7 @@ import { toFormData } from "../lib/form-data";
 
 const RESEND_COOLDOWN_SECONDS = 45;
 
+/** Manages 6-digit email verification form submission, OTP resend cooldown, and redirect. */
 export function useVerifyEmail({ email }: { email?: string }) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);

@@ -9,6 +9,7 @@ import { toFormData } from "../lib/form-data";
 
 const FALLBACK_MESSAGE = "Something went wrong. Please try again.";
 
+/** Manages email/password registration form state and navigates to email verification. */
 export function useSignUp() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);

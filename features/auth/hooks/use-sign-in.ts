@@ -9,6 +9,7 @@ import { toFormData } from "../lib/form-data";
 
 const FALLBACK_MESSAGE = "Something went wrong. Please try again.";
 
+/** Manages email/password sign-in form state, transition pending status, and redirect. */
 export function useSignIn() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);

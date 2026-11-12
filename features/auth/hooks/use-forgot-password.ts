@@ -7,6 +7,7 @@ import { sendPasswordResetOtp } from "../actions/forgot-password";
 import { mapOtpError } from "../lib/otp-error";
 import { toFormData } from "../lib/form-data";
 
+/** Manages forgot-password form submission and OTP request error state. */
 export function useForgotPassword() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

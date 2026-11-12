@@ -27,7 +27,7 @@ export async function signUpWithEmail(
 
   const { error } = await auth.signUp.email({
     ...parsed.data,
-    image: generateAvatar({ seed: parsed.data.email }),
+    image: generateAvatar(),
   });
   if (error) return { error: error.message || "Failed to create account" };
 
