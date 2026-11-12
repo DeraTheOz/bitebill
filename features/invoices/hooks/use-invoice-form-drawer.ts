@@ -16,8 +16,10 @@ import {
 } from "./use-invoice-queries";
 import { useInvoiceDraftStore } from "../store/invoice-draft-store";
 
+/** Formats a `Date` as a `yyyy-MM-dd` calendar date string. */
 const isoDate = (date: Date) => format(date, "yyyy-MM-dd");
 
+/** Returns initial invoice form values with today's issue date and a 14-day due date. */
 function createDefaults(): InvoiceFormInput {
   const now = new Date();
   return {
@@ -31,6 +33,7 @@ function createDefaults(): InvoiceFormInput {
   };
 }
 
+/** Manages create/edit invoice drawer form state, line-item array, session drafts, and submit intents. */
 export function useInvoiceFormDrawer(
   mode: "create" | "edit",
   onClose: () => void,

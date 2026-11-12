@@ -1,4 +1,4 @@
-import { BillFromView } from "@/features/branding/components/bill-from";
+import { BillFromView } from "@/features/branding/components/bill-from-view";
 import type { PublicBranding } from "@/features/branding/types/branding";
 import type { ClientAddress } from "@/features/clients/types/client";
 import { formatDate, formatMoney } from "@/lib/format";
@@ -76,24 +76,27 @@ export function InvoiceDocument({
         <BillFromView branding={branding} logoUrl={logoUrl} align="right" />
       </div>
 
-      <div className="mt-7 grid grid-cols-2 grid-rows-[48px_48px_48px] gap-y-7.75 md:mt-10 md:grid-cols-3 md:grid-rows-none">
-        <div className="flex flex-col gap-7 justify-between">
+      <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-7 md:mt-10 md:grid-cols-3">
+        <div className="flex flex-col gap-7">
           <Info label="Invoice Date" value={formatDate(invoice.issueDate)} />
           <Info label="Payment Due" value={formatDate(invoice.dueDate)} />
         </div>
 
-        <Info
-          className="col-start-2 row-span-2 row-start-1 md:col-auto md:row-auto"
-          label="Bill To"
-          value={client?.name ?? "—"}>
-          {addressLines.length > 0 && (
-            <p className="mt-2 whitespace-pre-line text-[13px] leading-4.5 text-muted">
-              {addressLines.join("\n")}
-            </p>
-          )}
-        </Info>
+        <div className="flex min-w-0 flex-col gap-7 md:contents">
+          <Info label="Bill To" value={client?.name ?? "—"}>
+            {addressLines.length > 0 && (
+              <p className="mt-2 whitespace-pre-line text-[13px] leading-4.5 text-muted">
+                {addressLines.join("\n")}
+              </p>
+            )}
+          </Info>
 
-        <Info label="Sent to" value={client?.email ?? "—"} />
+          <Info
+            className="min-w-0"
+            label="Sent to"
+            value={client?.email ?? "—"}
+          />
+        </div>
       </div>
 
       <div className="mt-10 overflow-hidden rounded-lg">

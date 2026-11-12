@@ -41,8 +41,8 @@ export function formatDate(isoDate: string) {
 }
 
 /**
- * Formats an ISO timestamp as a date and 24-hour time in UTC
- * (e.g. `01 Feb 2026, 14:30`).
+ * Formats an ISO timestamp as a date and 24-hour time in the user's
+ * local timezone (e.g. `01 Feb 2026, 14:30`).
  *
  * @param isoTimestamp - Full ISO timestamp.
  */
@@ -53,7 +53,6 @@ export function formatDateTime(isoTimestamp: string) {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: "UTC",
   });
 }
 

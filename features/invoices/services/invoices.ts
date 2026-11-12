@@ -58,16 +58,20 @@ export type InvoiceListResult = {
   summary?: InvoiceSummary;
 };
 
+/** Rounds a number to 2 decimal places using half-up epsilon adjustment. */
 const round2 = (value: number) =>
   Math.round((value + Number.EPSILON) * 100) / 100;
 
+/** Formats a numeric monetary value into a fixed 2-decimal string for Postgres `numeric`. */
 const money = (value: number) => round2(value).toFixed(2);
 
+/** Returns today's UTC calendar date as `YYYY-MM-DD`. */
 const today = () => new Date().toISOString().slice(0, 10);
 
 const ownership = (userId: string) => eq(invoices.userId, userId);
 const notDeleted = () => isNull(invoices.deletedAt);
 
+/** Returns the Drizzle SQL predicate matching invoices whose computed status is overdue. */
 function overdueSql(): SQL<unknown> {
   return and(lt(invoices.dueDate, today()), ne(invoices.status, "paid"))!;
 }
@@ -90,6 +94,7 @@ function ilikePattern(term: string) {
   return `%${term.replace(/[\\%_]/g, "\\$&")}%`;
 }
 
+/** Builds a case-insensitive search predicate matching invoice numbers or client names. */
 function searchFilter(q?: string) {
   const term = q?.trim();
   if (!term) return undefined;
@@ -110,10 +115,12 @@ export function computeInvoiceStatus(
   return status;
 }
 
+/** Resolves the effective display status (`overdue` when past due) for an invoice row. */
 function toStatus(row: InvoiceRow): InvoiceStatus {
   return computeInvoiceStatus(row.status, row.dueDate);
 }
 
+/** Converts an invoice line item row into a numeric DTO. */
 export function toInvoiceItemDto(row: InvoiceItemRow): InvoiceItem {
   return {
     id: row.id,
@@ -125,6 +132,7 @@ export function toInvoiceItemDto(row: InvoiceItemRow): InvoiceItem {
   };
 }
 
+/** Converts an invoice activity event row into an API DTO. */
 function toEventDto(row: InvoiceEventRow): InvoiceEvent {
   return {
     id: row.id,
@@ -134,6 +142,7 @@ function toEventDto(row: InvoiceEventRow): InvoiceEvent {
   };
 }
 
+/** Projects a client row into the subset embedded on invoice details. */
 function toClientDto(row: ClientRow): InvoiceClient {
   return {
     id: row.id,
@@ -150,6 +159,7 @@ function toClientDto(row: ClientRow): InvoiceClient {
   };
 }
 
+/** Maps an invoice database row with client, items, and audit events into an `Invoice` DTO. */
 function toInvoiceDto(
   row: InvoiceRow,
   client: ClientRow | null,
@@ -184,7 +194,10 @@ function toInvoiceDto(
  * Computes line totals and rollups. The client never supplies these
  * values, totals are always derived from quantities and unit prices.
  */
-function computeTotals(items: InvoiceItemValues[], taxRate: number) {
+export function computeInvoiceTotals(
+  items: InvoiceItemValues[],
+  taxRate: number,
+) {
   const normalized = items.map((item, index) => {
     const total = round2(item.quantity * item.unitPrice);
     return {
@@ -207,6 +220,7 @@ function computeTotals(items: InvoiceItemValues[], taxRate: number) {
   return { normalized, subtotal, tax, discount, total };
 }
 
+/** Constructs an insert payload for an invoice audit timeline event. */
 function eventValues(
   invoiceId: string,
   userId: string,
@@ -216,10 +230,12 @@ function eventValues(
   return { invoiceId, userId, eventType, description };
 }
 
+/** Returns `true` when a database error corresponds to Postgres unique constraint violation (`23505`). */
 function isUniqueViolation(error: unknown) {
   return (error as { code?: string }).code === "23505";
 }
 
+/** Lists paginated, non-deleted invoices owned by `userId` with optional client summary totals. */
 export async function listInvoices(
   userId: string,
   params: InvoiceListParams,
@@ -334,6 +350,7 @@ async function getClientInvoiceSummary(
   };
 }
 
+/** Fetches a single non-deleted invoice with its client, line items, and activity timeline. */
 export async function getInvoice(
   userId: string,
   invoiceId: string,
@@ -368,12 +385,18 @@ export async function getInvoice(
   return toInvoiceDto(row, client ?? null, items, events);
 }
 
+/** Creates an invoice with sequential numbering, server-computed totals, and a creation audit event. */
 export async function createInvoice(
   userId: string,
-  input: { status: InvoiceStatusIntent; values: InvoiceFormValues },
+  input: {
+    status: InvoiceStatusIntent;
+    values: InvoiceFormValues;
+    recurringTemplateId?: string;
+    recurringTemplateTitle?: string;
+  },
 ): Promise<Invoice> {
   const invoiceId = crypto.randomUUID();
-  const { normalized, subtotal, tax, discount, total } = computeTotals(
+  const { normalized, subtotal, tax, discount, total } = computeInvoiceTotals(
     input.values.items,
     input.values.taxRate,
   );
@@ -394,6 +417,9 @@ export async function createInvoice(
 
     const sequence = sequenceRow?.next ?? 1;
     const invoiceNumber = `${prefix}-${String(sequence).padStart(4, "0")}`;
+    const eventDescription = input.recurringTemplateTitle
+      ? `Invoice ${invoiceNumber} generated from recurring invoice "${input.recurringTemplateTitle}"`
+      : `Invoice ${invoiceNumber} created`;
 
     try {
       await db.batch([
@@ -401,6 +427,7 @@ export async function createInvoice(
           id: invoiceId,
           userId,
           clientId: input.values.clientId,
+          recurringTemplateId: input.recurringTemplateId ?? null,
           invoiceNumber,
           invoiceSequence: sequence,
           status: input.status,
@@ -431,12 +458,7 @@ export async function createInvoice(
         db
           .insert(invoiceEvents)
           .values(
-            eventValues(
-              invoiceId,
-              userId,
-              "created",
-              `Invoice ${invoiceNumber} created`,
-            ),
+            eventValues(invoiceId, userId, "created", eventDescription),
           ),
       ]);
 
@@ -453,6 +475,7 @@ export async function createInvoice(
   throw new Error("Could not allocate an invoice number");
 }
 
+/** Updates an owned invoice, recalculates totals, replaces line items, and logs an update event. */
 export async function updateInvoice(
   userId: string,
   invoiceId: string,
@@ -469,7 +492,7 @@ export async function updateInvoice(
   const nextStatus: StoredInvoiceStatus =
     existing.status === "paid" ? "paid" : (input.status ?? existing.status);
 
-  const { normalized, subtotal, tax, discount, total } = computeTotals(
+  const { normalized, subtotal, tax, discount, total } = computeInvoiceTotals(
     input.values.items,
     input.values.taxRate,
   );
@@ -520,6 +543,7 @@ export async function updateInvoice(
   return getInvoice(userId, invoiceId);
 }
 
+/** Marks an owned non-deleted invoice as paid and records a payment audit event. */
 export async function markInvoicePaid(
   userId: string,
   invoiceId: string,
@@ -561,6 +585,7 @@ export async function markInvoicePaid(
   return { outcome: "paid", invoice };
 }
 
+/** Soft-deletes an owned invoice and appends a deletion audit event. */
 export async function deleteInvoice(
   userId: string,
   invoiceId: string,
@@ -593,6 +618,7 @@ export async function deleteInvoice(
   return deleted[0].length > 0;
 }
 
+/** Appends a PDF download event to an invoice's activity timeline. */
 export async function logInvoiceDownloadEvent(
   userId: string,
   invoiceId: string,

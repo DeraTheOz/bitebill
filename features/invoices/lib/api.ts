@@ -25,6 +25,7 @@ export type InvoiceListResult = {
   summary?: InvoiceSummary;
 };
 
+/** Client HTTP error thrown when an invoice API call fails. */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -35,6 +36,7 @@ export class ApiError extends Error {
   }
 }
 
+/** Sends a JSON request to the invoices API and unwraps error messages. */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -53,6 +55,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+/** Typed client wrapper around the `/api/invoices` and PDF download endpoints. */
 export const invoicesApi = {
   list: async ({
     page,

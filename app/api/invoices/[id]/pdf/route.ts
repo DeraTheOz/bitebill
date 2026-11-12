@@ -15,6 +15,7 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+/** Generates and downloads a PDF for an owned invoice, appending a download audit event. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 

@@ -3,6 +3,7 @@ import { markInvoicePaid } from "@/features/invoices/services/invoices";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+/** Marks an owned invoice as paid and records the payment event. */
 export async function POST(_request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 

@@ -14,6 +14,7 @@ import type {
 
 // List and detail share the ["invoices"] prefix so a single
 // invalidateQueries({ queryKey: invoiceKeys.all }) refreshes both.
+/** TanStack Query key factory for invoice lists and detail queries. */
 export const invoiceKeys = {
   all: ["invoices"] as const,
   list: (params: InvoiceListRequest) =>
@@ -21,6 +22,7 @@ export const invoiceKeys = {
   detail: (id: string) => ["invoices", "detail", id] as const,
 };
 
+/** Fetches paginated invoices matching the active filters while retaining previous page data. */
 export function useInvoices(params: InvoiceListRequest) {
   return useQuery({
     queryKey: invoiceKeys.list(params),
@@ -30,6 +32,7 @@ export function useInvoices(params: InvoiceListRequest) {
   });
 }
 
+/** Fetches a single invoice by id when `id` is non-empty. */
 export function useInvoice(id: string) {
   return useQuery({
     queryKey: invoiceKeys.detail(id),
@@ -38,6 +41,7 @@ export function useInvoice(id: string) {
   });
 }
 
+/** Creates an invoice and invalidates invoice, client, and dashboard query caches. */
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
 
@@ -58,6 +62,7 @@ export function useCreateInvoice() {
   });
 }
 
+/** Updates an invoice and invalidates dependent invoice, client, and dashboard queries. */
 export function useUpdateInvoice() {
   const queryClient = useQueryClient();
 
@@ -80,6 +85,7 @@ export function useUpdateInvoice() {
   });
 }
 
+/** Soft-deletes an invoice and updates invoice, client, and dashboard caches. */
 export function useDeleteInvoice() {
   const queryClient = useQueryClient();
 
@@ -94,6 +100,7 @@ export function useDeleteInvoice() {
   });
 }
 
+/** Marks an invoice as paid and refreshes cached invoice, client, and dashboard views. */
 export function useMarkInvoicePaid() {
   const queryClient = useQueryClient();
 
@@ -108,6 +115,7 @@ export function useMarkInvoicePaid() {
   });
 }
 
+/** Downloads an invoice PDF and refreshes its detail query so the audit timeline updates. */
 export function useDownloadInvoicePdf() {
   const queryClient = useQueryClient();
 

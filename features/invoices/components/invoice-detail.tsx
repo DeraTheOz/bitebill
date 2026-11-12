@@ -221,18 +221,16 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }) {
         {invoice.internalNotes && (
           <section
             aria-labelledby="internal-notes-heading"
-            className="mt-6 rounded-lg border border-border bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none md:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Lock className="size-4 shrink-0 text-purple" aria-hidden="true" />
-                <h2
-                  id="internal-notes-heading"
-                  className="translate-y-[1.5px] text-[15px] font-bold text-ink">
-                  Internal Notes
-                </h2>
-              </div>
-              <span className="rounded-full bg-surface-subtle px-2.5 py-0.5 text-[11px] font-bold text-muted">
-                Private — only visible to you
+            className="mt-6 rounded-lg border border-dashed border-border bg-surface p-6 shadow-[0_10px_10px_-10px_rgba(var(--shadow-navy),0.1)] dark:shadow-none md:p-8">
+            <div className="flex items-center gap-2">
+              <Lock className="size-4 shrink-0 text-purple" aria-hidden="true" />
+              <h2
+                id="internal-notes-heading"
+                className="text-[15px] font-bold text-ink">
+                Internal Notes
+              </h2>
+              <span className="ml-auto rounded-full bg-purple/10 px-2.5 py-0.5 text-[11px] font-bold text-purple dark:bg-purple/15 dark:text-purple-light">
+                Private
               </span>
             </div>
             <p className="mt-3 whitespace-pre-line text-[13px] leading-5.5 text-muted">

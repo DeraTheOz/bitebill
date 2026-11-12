@@ -14,7 +14,7 @@ export function Info({
   return (
     <div className={className}>
       <p className="text-[13px] text-muted">{label}</p>
-      <p className="mt-3 text-[15px] font-bold">{value}</p>
+      <p className="mt-3 wrap-anywhere text-[15px] font-bold">{value}</p>
       {children}
     </div>
   );

@@ -16,6 +16,7 @@ const listInvoicesQuerySchema = z.object({
 
 const statusTokenSchema = z.enum(["draft", "pending", "paid", "overdue"]);
 
+/** Lists paginated invoices for the authenticated user with status, client, and search filters. */
 export async function GET(request: Request) {
   const user = await getSessionUser();
 
@@ -54,6 +55,7 @@ export async function GET(request: Request) {
   }
 }
 
+/** Creates a new invoice with server-calculated line totals and sequence numbering. */
 export async function POST(request: Request) {
   const user = await getSessionUser();
 

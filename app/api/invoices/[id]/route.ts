@@ -8,6 +8,7 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+/** Fetches a single owned invoice with line items, client details, and event history. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 
@@ -29,6 +30,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   }
 }
 
+/** Updates an owned invoice and recalculates line and tax totals on the server. */
 export async function PUT(request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 
@@ -67,6 +69,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
   }
 }
 
+/** Soft-deletes an owned invoice and records a deletion event. */
 export async function DELETE(_request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 

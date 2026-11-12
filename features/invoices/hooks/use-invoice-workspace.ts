@@ -3,6 +3,7 @@ import type { InvoiceStatus } from "../types/invoice";
 import { useInvoices } from "./use-invoice-queries";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
+/** Manages search, status filters, pagination, and create drawer state on the invoices page. */
 export function useInvoiceWorkspace() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);

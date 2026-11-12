@@ -46,6 +46,7 @@ export type UseTaxRateInputOptions = {
   onBlur?: () => void;
 };
 
+/** Controls percentage tax-rate input formatting, decimal precision, paste sanitization, and blur normalization. */
 export function useTaxRateInput({
   value,
   onChange,
