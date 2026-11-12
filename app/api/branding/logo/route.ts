@@ -2,6 +2,7 @@ import { getSessionUser } from "@/features/auth/lib/session";
 import { createLogoImageResponse } from "@/features/branding/lib/logo";
 import { getBrandingLogo } from "@/features/branding/services/branding";
 
+/** Serves the authenticated user's uploaded branding logo with private caching. */
 export async function GET() {
   const user = await getSessionUser();
 

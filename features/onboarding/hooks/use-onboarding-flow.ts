@@ -20,12 +20,14 @@ import {
 } from "../schemas/onboarding-schema";
 import type { OnboardingStep } from "../components/step-indicator";
 
+/** Ordered step definitions rendered by the onboarding step indicator. */
 export const ONBOARDING_STEPS: readonly OnboardingStep[] = [
   { label: "Business", icon: Building2 },
   { label: "Address", icon: MapPin },
   { label: "Branding", icon: Palette },
 ] as const;
 
+/** Maps each onboarding form field name to the step index where it appears. */
 export const STEP_BY_FIELD: Record<string, number> = {
   businessName: 0,
   businessEmail: 0,
@@ -44,6 +46,7 @@ export const STEP_BY_FIELD: Record<string, number> = {
   defaultTerms: 2,
 };
 
+/** Field names validated before advancing out of each onboarding step. */
 export const STEP_FIELDS: Record<number, readonly FieldPath<OnboardingValues>[]> = {
   0: ["businessName", "businessEmail", "businessPhone", "website"],
   1: ["addressLine1", "addressLine2", "city", "state", "country"],
@@ -80,6 +83,7 @@ export type UseOnboardingFlowReturn = {
   onSubmit: () => Promise<void>;
 };
 
+/** Manages multi-step onboarding form state, step validation, and initial workspace setup. */
 export function useOnboardingFlow({
   user,
 }: UseOnboardingFlowOptions): UseOnboardingFlowReturn {

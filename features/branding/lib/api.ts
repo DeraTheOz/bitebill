@@ -1,6 +1,10 @@
 import type { BrandingSettings } from "../types/branding";
-import type { BrandingSettingsValues } from "../schemas/branding-schema";
+import type {
+  BrandingPatchValues,
+  BrandingSettingsValues,
+} from "../schemas/branding-schema";
 
+/** Client HTTP error thrown when a branding API call responds with a non-2xx status. */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -11,6 +15,7 @@ export class ApiError extends Error {
   }
 }
 
+/** Sends a JSON request to the branding API and unwraps parsed error payloads. */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -29,6 +34,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+/** Typed client wrapper around the `/api/branding` endpoints. */
 export const brandingApi = {
   get: async () => {
     const { settings } = await request<{
@@ -41,6 +47,14 @@ export const brandingApi = {
     const { settings } = await request<{ settings: BrandingSettings }>(
       "/api/branding",
       { method: "PUT", body: JSON.stringify(values) },
+    );
+    return settings;
+  },
+
+  patch: async (values: BrandingPatchValues) => {
+    const { settings } = await request<{ settings: BrandingSettings }>(
+      "/api/branding",
+      { method: "PATCH", body: JSON.stringify(values) },
     );
     return settings;
   },

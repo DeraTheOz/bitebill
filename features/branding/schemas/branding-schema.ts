@@ -32,41 +32,43 @@ export const businessPhoneSchema = z.union([
     ),
 ]);
 
-/**
- * Canonical payload for onboarding and settings. The form uses
- * the same field names, so client and server validation cannot drift.
- */
-export const brandingSettingsSchema = z.object({
+export const businessFieldsSchema = z.object({
   businessName: z
     .string()
     .trim()
     .min(2, "Business name must be at least 2 characters")
-    .regex(/^[\p{L}\s]+$/u, "Business name must contain only letters"),
+    .max(120, "Keep business name under 120 characters")
+    .refine(
+      (val) => /[\p{L}\p{N}]/u.test(val),
+      "Business name must include letters or numbers",
+    ),
   businessEmail: z.email("Enter a valid email"),
   businessPhone: businessPhoneSchema,
   website: z.union([
     z.literal(""),
     z.url("Enter a valid URL, e.g. https://yoursite.com"),
   ]),
+});
+
+export const addressFieldsSchema = z.object({
   addressLine1: z.string().trim().min(3, "Street address is required"),
   addressLine2: z.string().trim(),
   city: z
     .string()
     .trim()
     .min(2, "City is required")
-    .regex(
-      /^[\p{L}]{2,}(?:[\s\-][\p{L}]{2,})*$/u,
-      "Enter a valid city name (letters only)",
-    ),
+    .max(100, "Keep city under 100 characters")
+    .refine((val) => /\p{L}/u.test(val), "Enter a valid city name"),
   state: z
     .string()
     .trim()
     .min(2, "State or region is required")
-    .regex(
-      /^[\p{L}]{2,}(?:[\s\-][\p{L}]{2,})*$/u,
-      "Enter a valid state or region (letters only)",
-    ),
+    .max(100, "Keep state or region under 100 characters")
+    .refine((val) => /\p{L}/u.test(val), "Enter a valid state or region"),
   country: z.string().trim().min(1, "Select a country"),
+});
+
+export const brandingFieldsSchema = z.object({
   logoUrl: brandingLogoUrlSchema,
   brandColor: z
     .string()
@@ -79,4 +81,45 @@ export const brandingSettingsSchema = z.object({
   defaultTerms: z.string().max(500, "Keep terms under 500 characters"),
 });
 
+/**
+ * Canonical payload for onboarding and full branding replacement.
+ * The form uses the same field names, so client and server validation cannot drift.
+ */
+export const brandingSettingsSchema = z.object({
+  ...businessFieldsSchema.shape,
+  ...addressFieldsSchema.shape,
+  ...brandingFieldsSchema.shape,
+});
+
+/**
+ * Partial update payload for settings forms. Omitting `logoUrl` preserves the
+ * existing stored logo instead of clearing it.
+ */
+export const brandingPatchSchema = brandingSettingsSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Provide at least one setting to update",
+  });
+
+export const businessIdentitySettingsSchema = z.object({
+  ...businessFieldsSchema.shape,
+  ...addressFieldsSchema.shape,
+  brandColor: brandingFieldsSchema.shape.brandColor,
+  logoUrl: brandingLogoUrlSchema.optional(),
+});
+
+export const pdfDefaultsSettingsSchema = z.object({
+  currency: brandingFieldsSchema.shape.currency,
+  invoicePrefix: brandingFieldsSchema.shape.invoicePrefix,
+  pdfTemplate: brandingFieldsSchema.shape.pdfTemplate,
+  defaultTerms: brandingFieldsSchema.shape.defaultTerms,
+});
+
 export type BrandingSettingsValues = z.infer<typeof brandingSettingsSchema>;
+export type BrandingPatchValues = z.infer<typeof brandingPatchSchema>;
+export type BusinessIdentitySettingsValues = z.infer<
+  typeof businessIdentitySettingsSchema
+>;
+export type PdfDefaultsSettingsValues = z.infer<
+  typeof pdfDefaultsSettingsSchema
+>;

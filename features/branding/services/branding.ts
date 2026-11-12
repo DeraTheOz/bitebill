@@ -9,7 +9,10 @@ import type {
   BrandingSettings,
   PdfTemplate,
 } from "../types/branding";
-import type { BrandingSettingsValues } from "../schemas/branding-schema";
+import type {
+  BrandingPatchValues,
+  BrandingSettingsValues,
+} from "../schemas/branding-schema";
 
 type BrandingSettingsRow = typeof brandingSettings.$inferSelect;
 
@@ -45,6 +48,7 @@ const fields = {
   updatedAt: brandingSettings.updatedAt,
 };
 
+/** Maps a branding database projection row to a client-safe DTO without raw logo bytes. */
 function toDto(row: SettingsRow): BrandingSettings {
   return {
     id: row.id,
@@ -69,6 +73,7 @@ function toDto(row: SettingsRow): BrandingSettings {
   };
 }
 
+/** Normalizes blank strings to `null` for nullable database columns. */
 function toNull(value: string) {
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
@@ -111,6 +116,7 @@ export async function getBrandingLogo(
   };
 }
 
+/** Creates or overwrites a user's full workspace branding settings record. */
 export async function saveBrandingSettings(
   userId: string,
   input: BrandingSettingsValues,
@@ -148,4 +154,72 @@ export async function saveBrandingSettings(
     .returning(fields);
 
   return toDto(row);
+}
+
+/**
+ * Updates a subset of branding settings. When `logoUrl` is omitted (`undefined`),
+ * the existing `logo_url` column is left untouched.
+ */
+export async function updateBrandingSettings(
+  userId: string,
+  input: BrandingPatchValues,
+): Promise<BrandingSettings | null> {
+  const updates: Partial<typeof brandingSettings.$inferInsert> = {
+    updatedBy: userId,
+    updatedAt: new Date(),
+  };
+
+  if (input.businessName !== undefined) {
+    updates.businessName = input.businessName.trim();
+  }
+  if (input.businessEmail !== undefined) {
+    updates.businessEmail = input.businessEmail.trim();
+  }
+  if (input.businessPhone !== undefined) {
+    updates.businessPhone = toNull(input.businessPhone);
+  }
+  if (input.website !== undefined) {
+    updates.website = toNull(input.website);
+  }
+  if (input.addressLine1 !== undefined) {
+    updates.addressLine1 = toNull(input.addressLine1);
+  }
+  if (input.addressLine2 !== undefined) {
+    updates.addressLine2 = toNull(input.addressLine2);
+  }
+  if (input.city !== undefined) {
+    updates.city = toNull(input.city);
+  }
+  if (input.state !== undefined) {
+    updates.state = toNull(input.state);
+  }
+  if (input.country !== undefined) {
+    updates.country = toNull(input.country);
+  }
+  if (input.currency !== undefined) {
+    updates.currency = input.currency;
+  }
+  if (input.logoUrl !== undefined) {
+    updates.logoUrl = toNull(input.logoUrl);
+  }
+  if (input.invoicePrefix !== undefined) {
+    updates.invoicePrefix = input.invoicePrefix.toUpperCase();
+  }
+  if (input.defaultTerms !== undefined) {
+    updates.defaultTerms = toNull(input.defaultTerms);
+  }
+  if (input.pdfTemplate !== undefined) {
+    updates.defaultPdfTemplate = input.pdfTemplate;
+  }
+  if (input.brandColor !== undefined) {
+    updates.brandColor = input.brandColor;
+  }
+
+  const [row] = await db
+    .update(brandingSettings)
+    .set(updates)
+    .where(eq(brandingSettings.userId, userId))
+    .returning(fields);
+
+  return row ? toDto(row) : null;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
+import { useBrandingSettings } from "../hooks/use-branding-queries";
 import type { BrandingSettings } from "../types/branding";
 
 const BrandingContext = createContext<BrandingSettings | null>(null);
@@ -12,13 +13,17 @@ export function BrandingProvider({
   settings: BrandingSettings;
   children: React.ReactNode;
 }) {
+  const { data } = useBrandingSettings(settings);
+  const currentSettings = data ?? settings;
+
   return (
-    <BrandingContext.Provider value={settings}>
+    <BrandingContext.Provider value={currentSettings}>
       {children}
     </BrandingContext.Provider>
   );
 }
 
+/** Reads the active workspace branding settings from `BrandingProvider`. */
 export function useBranding() {
   const settings = useContext(BrandingContext);
 

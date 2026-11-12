@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FormProvider } from "react-hook-form";
 import {
@@ -8,8 +9,8 @@ import {
   Check,
   LoaderCircle,
 } from "lucide-react";
+import { LogoutConfirmDialog } from "@/components/layout/logout-confirm-dialog";
 import { MotionProvider } from "@/components/motion-provider";
-import { signOut } from "@/features/auth/actions/sign-out";
 import { ThemeToggle } from "@/features/theme/components/theme-toggle";
 import { useOnboardingFlow } from "../hooks/use-onboarding-flow";
 import { InvoicePreview } from "./invoice-preview";
@@ -41,6 +42,7 @@ type OnboardingFlowProps = {
 };
 
 export function OnboardingFlow({ user }: OnboardingFlowProps) {
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const {
     methods,
     step,
@@ -63,13 +65,12 @@ export function OnboardingFlow({ user }: OnboardingFlowProps) {
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
           <div className="mb-10 flex items-center justify-end gap-4">
             <ThemeToggle className="grid size-10 place-items-center" />
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="text-[13px] font-bold text-muted-light transition-colors hover:text-purple focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple">
-                Sign out
-              </button>
-            </form>
+            <button
+              type="button"
+              onClick={() => setIsLogoutOpen(true)}
+              className="text-[13px] font-bold text-muted-light transition-colors hover:text-purple focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple">
+              Sign out
+            </button>
           </div>
           <header className="flex max-w-3xl flex-col items-start gap-4">
             <span className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-[13px] font-bold text-purple">
@@ -169,6 +170,9 @@ export function OnboardingFlow({ user }: OnboardingFlowProps) {
             </aside>
           </div>
         </div>
+        {isLogoutOpen && (
+          <LogoutConfirmDialog onClose={() => setIsLogoutOpen(false)} />
+        )}
       </FormProvider>
     </MotionProvider>
   );
