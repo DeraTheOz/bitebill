@@ -9,7 +9,11 @@ import { useClickOutside } from "@/hooks/use-click-outside";
 import { NavLinks } from "./nav-links";
 import { SignOutButton } from "./sign-out-button";
 
-export function MobileMenu() {
+export function MobileMenu({
+  onRequestSignOut,
+}: {
+  onRequestSignOut?: () => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -89,7 +93,13 @@ export function MobileMenu() {
 
               <div className="flex flex-1 flex-col overflow-y-auto px-3 py-6">
                 <NavLinks onNavigate={close} />
-                <SignOutButton className="mt-auto" onSignOut={close} />
+                <SignOutButton
+                  className="mt-auto"
+                  onSignOut={() => {
+                    close();
+                    onRequestSignOut?.();
+                  }}
+                />
               </div>
             </motion.div>
           </motion.div>

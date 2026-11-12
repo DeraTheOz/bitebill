@@ -1,6 +1,8 @@
 import {
   FileText,
   LayoutDashboard,
+  Repeat,
+  Settings,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -11,8 +13,11 @@ export type NavItem = {
   icon: LucideIcon;
 };
 
+/** Primary workspace navigation destinations rendered in the app sidebar and mobile menu. */
 export const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/clients", label: "Clients", icon: Users },
   { href: "/invoices", label: "Invoices", icon: FileText },
+  { href: "/recurring-invoices", label: "Recurring", icon: Repeat },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
