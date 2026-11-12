@@ -18,6 +18,7 @@ export type UseCustomSelectFieldOptions = {
   placement?: "auto" | "bottom" | "top";
 };
 
+/** Manages accessible custom select listbox state, auto-placement, and arrow/Escape navigation. */
 export function useCustomSelectField({
   id,
   name,

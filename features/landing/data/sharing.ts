@@ -1,3 +1,4 @@
+/** Highlights describing public invoice sharing links on the landing page. */
 export const sharingPoints = [
   "A public link at /share/[token] for every invoice",
   "Clients can view and download the PDF without an account",

@@ -15,12 +15,14 @@ export type ClientListQuery = {
   activity?: ClientActivityFilter;
 };
 
+/** TanStack Query key factory for client lists and details. */
 export const clientKeys = {
   all: ["clients"] as const,
   list: (params: ClientListQuery) => ["clients", "list", params] as const,
   detail: (id: string) => ["client", id] as const,
 };
 
+/** Fetches paginated clients while keeping the previous page visible across page turns. */
 export function useClients(params: ClientListQuery) {
   return useQuery({
     queryKey: clientKeys.list(params),
@@ -31,6 +33,7 @@ export function useClients(params: ClientListQuery) {
   });
 }
 
+/** Fetches a single client by id when `id` is non-empty. */
 export function useClient(id: string) {
   return useQuery({
     queryKey: clientKeys.detail(id),
@@ -39,6 +42,7 @@ export function useClient(id: string) {
   });
 }
 
+/** Creates a client and invalidates cached client lists. */
 export function useCreateClient() {
   const queryClient = useQueryClient();
 
@@ -50,6 +54,7 @@ export function useCreateClient() {
   });
 }
 
+/** Updates an existing client and refreshes both list and detail caches. */
 export function useUpdateClient() {
   const queryClient = useQueryClient();
 
@@ -63,6 +68,7 @@ export function useUpdateClient() {
   });
 }
 
+/** Soft-deletes a client and evicts its cached detail query. */
 export function useDeleteClient() {
   const queryClient = useQueryClient();
 

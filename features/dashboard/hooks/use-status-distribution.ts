@@ -4,10 +4,12 @@ import { useMemo } from "react";
 import type { StatusDistributionItem } from "../types/dashboard";
 import { statusConfig } from "../lib/status-config";
 
+/** Placeholder slice rendered in the status pie chart when a user has no invoices yet. */
 export const EMPTY_PIE_DATA = [
   { name: "None", count: 1, fill: "var(--border)", fillOpacity: 0.3 },
 ];
 
+/** Derives pie chart slices, empty placeholder data, and pluralized labels from invoice status counts. */
 export function useStatusDistribution(
   items: StatusDistributionItem[],
   totalInvoices: number,

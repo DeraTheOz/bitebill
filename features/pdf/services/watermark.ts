@@ -2,6 +2,7 @@ import { degrees, type PDFPage, type PDFFont } from "pdf-lib";
 import { PDF_COLORS } from "./helpers";
 import type { InvoiceStatus } from "@/features/invoices/types/invoice";
 
+/** Draws a diagonal translucent status watermark (`PAID`, `OVERDUE`, or `DRAFT`) across a PDF page. */
 export function renderWatermark(
   page: PDFPage,
   font: PDFFont,

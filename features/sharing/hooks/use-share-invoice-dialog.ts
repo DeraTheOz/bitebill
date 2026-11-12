@@ -17,6 +17,7 @@ export type ExpirationPreset = "never" | "3" | "7" | "14" | "30";
 
 export type ShareConfirmAction = "regenerate" | "disable" | null;
 
+/** Preset expiration options when creating a new public invoice share link. */
 export const CREATE_EXPIRATION_OPTIONS: readonly CustomSelectOption[] = [
   { value: "never", label: "Never expires" },
   { value: "3", label: "Expires in 3 days" },
@@ -25,6 +26,7 @@ export const CREATE_EXPIRATION_OPTIONS: readonly CustomSelectOption[] = [
   { value: "30", label: "Expires in 30 days" },
 ];
 
+/** Preset expiration options when updating an existing public invoice share link. */
 export const UPDATE_EXPIRATION_OPTIONS: readonly CustomSelectOption[] = [
   { value: "never", label: "Never expires" },
   { value: "3", label: "3 days from now" },
@@ -33,11 +35,13 @@ export const UPDATE_EXPIRATION_OPTIONS: readonly CustomSelectOption[] = [
   { value: "30", label: "30 days from now" },
 ];
 
+/** Converts a relative expiration preset token into an ISO timestamp, or `null` for non-expiring links. */
 function presetToExpiresAt(preset: ExpirationPreset): string | null {
   if (preset === "never") return null;
   return addDays(new Date(), Number(preset)).toISOString();
 }
 
+/** Manages share link creation, regeneration, expiration updates, clipboard copying, and dialog dismissal. */
 export function useShareInvoiceDialog({
   invoiceId,
   onClose,

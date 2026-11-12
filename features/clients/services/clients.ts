@@ -47,6 +47,7 @@ const hasInvoicesSql = sql`exists (
     and "invoices"."deleted_at" is null
 )`;
 
+/** Maps a database client row into an API-friendly DTO with ISO timestamps. */
 function toClientDto(row: ClientRow): Client {
   return {
     id: row.id,
@@ -76,6 +77,7 @@ function ilikePattern(term: string) {
   return `%${term.replace(/[\\%_]/g, "\\$&")}%`;
 }
 
+/** Builds a case-insensitive client search predicate across name, email, and company. */
 function searchFilter(q?: string) {
   const term = q?.trim();
   if (!term) return undefined;
@@ -88,11 +90,13 @@ function searchFilter(q?: string) {
   );
 }
 
+/** Filters clients by whether they have any non-deleted invoices. */
 function activityFilter(activity?: ClientActivityFilter) {
   if (!activity) return undefined;
   return activity === "with" ? hasInvoicesSql : not(hasInvoicesSql);
 }
 
+/** Lists paginated, non-deleted clients owned by `userId` with active invoice counts. */
 export async function listClients(
   userId: string,
   params: ClientListParams,
@@ -145,6 +149,7 @@ export async function listClients(
   };
 }
 
+/** Fetches a single non-deleted client owned by `userId`, or `null` if not found. */
 export async function getClient(
   userId: string,
   clientId: string,
@@ -158,6 +163,7 @@ export async function getClient(
   return row ? toClientDto(row) : null;
 }
 
+/** Creates a client owned by `userId` and assigns a randomly generated avatar. */
 export async function createClient(
   userId: string,
   input: ClientFormValues,
@@ -185,6 +191,7 @@ export async function createClient(
   return toClientDto(row);
 }
 
+/** Updates an owned, non-deleted client record and returns the updated DTO. */
 export async function updateClient(
   userId: string,
   clientId: string,
@@ -212,6 +219,7 @@ export async function updateClient(
   return row ? toClientDto(row) : null;
 }
 
+/** Soft-deletes an owned client record by setting `deletedAt`. */
 export async function deleteClient(
   userId: string,
   clientId: string,

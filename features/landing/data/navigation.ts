@@ -3,6 +3,7 @@ export type NavLink = {
   label: string;
 };
 
+/** Anchor navigation links shown in the marketing page top bar. */
 export const navLinks: NavLink[] = [
   { href: "#features", label: "Features" },
   { href: "#pdf", label: "PDF export" },

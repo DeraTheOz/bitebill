@@ -1,5 +1,6 @@
 import type { DashboardData } from "../types/dashboard";
 
+/** Client HTTP error thrown when a dashboard API request fails. */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -10,6 +11,7 @@ export class ApiError extends Error {
   }
 }
 
+/** Sends a JSON request to the dashboard API and unwraps parsed error payloads. */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -28,6 +30,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+/** Typed client wrapper around the `/api/dashboard` endpoint. */
 export const dashboardApi = {
   get: (period = "6m") =>
     request<DashboardData>(`/api/dashboard?period=${encodeURIComponent(period)}`),

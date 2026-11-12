@@ -21,6 +21,7 @@ export type UseCurrencySelectFieldOptions = {
   disabled?: boolean;
 };
 
+/** Manages searchable currency selector dropdown state and filtering by code, symbol, or name. */
 export function useCurrencySelectField({
   id,
   name,

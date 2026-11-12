@@ -16,11 +16,14 @@ import type {
   StatusDistributionItem,
 } from "../types/dashboard";
 
+/** Rounds numeric currency totals to 2 decimal places. */
 const round2 = (value: number) =>
   Math.round((value + Number.EPSILON) * 100) / 100;
 
+/** Returns today's UTC calendar date in `YYYY-MM-DD` format. */
 const today = () => new Date().toISOString().slice(0, 10);
 
+/** Derives effective invoice status (`overdue` when an unpaid invoice's due date is in the past). */
 function computeStatus(
   rowStatus: "draft" | "pending" | "paid",
   dueDate: string,
@@ -31,6 +34,7 @@ function computeStatus(
   return rowStatus;
 }
 
+/** Aggregates revenue KPIs, status distribution, monthly trends, recent invoices, and recent activity for `userId`. */
 export async function getDashboardData(
   userId: string,
   period = "6m",

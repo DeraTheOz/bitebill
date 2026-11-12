@@ -12,6 +12,7 @@ export type UseCountrySelectFieldOptions = {
   disabled?: boolean;
 };
 
+/** Manages searchable country combobox state, filtering, focus, and keyboard dismissal. */
 export function useCountrySelectField({
   id,
   name,

@@ -10,6 +10,7 @@ type ThemeStore = {
   toggleTheme: () => void;
 };
 
+/** Returns `true` when the browser prefers a dark color scheme. */
 function prefersDark() {
   return (
     typeof window !== "undefined" &&
@@ -17,10 +18,12 @@ function prefersDark() {
   );
 }
 
+/** Resolves `"system"` theme preferences into `"light"` or `"dark"`. */
 export function resolveTheme(theme: Theme): ResolvedTheme {
   return theme === "system" ? (prefersDark() ? "dark" : "light") : theme;
 }
 
+/** Synchronizes the document root class and `color-scheme` CSS property with `theme`. */
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;
   const resolved = resolveTheme(theme);
@@ -28,6 +31,7 @@ export function applyTheme(theme: Theme) {
   root.style.colorScheme = resolved;
 }
 
+/** Persisted Zustand store holding the user's light/dark/system theme preference. */
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({

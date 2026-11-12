@@ -26,6 +26,7 @@ const defaultValues: ClientFormValues = {
   notes: "",
 };
 
+/** Manages create/edit client drawer form state, session draft persistence, and save submission. */
 export function useClientFormDrawer(
   mode: string,
   onClose: () => void,

@@ -49,14 +49,17 @@ export type PublicSharedLogoResult =
   | { outcome: "no-logo" }
   | { outcome: "ok"; logo: BrandingLogo };
 
+/** Generates a cryptographically random URL-safe token for public invoice links. */
 function generateShareToken(): string {
   return randomBytes(16).toString("base64url");
 }
 
+/** Returns `true` when an optional share expiration date is in the past. */
 function isShareExpired(expiresAt: Date | null): boolean {
   return expiresAt !== null && expiresAt.getTime() <= Date.now();
 }
 
+/** Converts an `invoice_shares` row into an API DTO with computed expiration status. */
 function toShareDto(row: InvoiceShareRow): InvoiceShare {
   return {
     id: row.id,
@@ -71,6 +74,7 @@ function toShareDto(row: InvoiceShareRow): InvoiceShare {
   };
 }
 
+/** Verifies that `invoiceId` exists, belongs to `userId`, and is not soft-deleted. */
 async function findOwnedInvoice(userId: string, invoiceId: string) {
   const [row] = await db
     .select({
@@ -90,6 +94,7 @@ async function findOwnedInvoice(userId: string, invoiceId: string) {
   return row ?? null;
 }
 
+/** Returns existing share metadata for an owned invoice, or `"not-found"` if inaccessible. */
 export async function getInvoiceShare(
   userId: string,
   invoiceId: string,
@@ -106,6 +111,7 @@ export async function getInvoiceShare(
   return { share: row ? toShareDto(row) : null };
 }
 
+/** Creates or regenerates a public share token for an owned invoice and appends an audit event. */
 export async function createOrRegenerateInvoiceShare(
   userId: string,
   invoiceId: string,
@@ -163,6 +169,7 @@ export async function createOrRegenerateInvoiceShare(
   return { share: toShareDto(created), created: true };
 }
 
+/** Updates or clears the expiration timestamp for an invoice's active public share link. */
 export async function updateInvoiceShareExpiration(
   userId: string,
   invoiceId: string,
@@ -188,6 +195,7 @@ export async function updateInvoiceShareExpiration(
   return { outcome: "ok", share: toShareDto(updated) };
 }
 
+/** Deletes the share link for an owned invoice and logs an audit event. */
 export async function revokeInvoiceShare(
   userId: string,
   invoiceId: string,
@@ -212,6 +220,7 @@ export async function revokeInvoiceShare(
   return "revoked";
 }
 
+/** Resolves a share token to its non-deleted invoice, client, and public branding if valid and unexpired. */
 async function resolveValidShare(token: string) {
   const [row] = await db
     .select({
@@ -279,6 +288,7 @@ async function resolveValidShare(token: string) {
   return { outcome: "ok" as const, row };
 }
 
+/** Loads sanitized public invoice data for `token` and increments view metrics for non-owner visitors. */
 export async function getPublicSharedInvoice(
   token: string,
   viewerUserId?: string | null,
@@ -362,6 +372,7 @@ export async function getPublicSharedInvoice(
   };
 }
 
+/** Generates a sanitized PDF for a valid public share token and logs a download audit event. */
 export async function getPublicSharedInvoicePdf(
   token: string,
 ): Promise<PublicSharedPdfResult> {
@@ -442,6 +453,7 @@ export async function getPublicSharedInvoicePdf(
   };
 }
 
+/** Fetches the owner's branding logo associated with a valid public share token. */
 export async function getPublicSharedInvoiceLogo(
   token: string,
 ): Promise<PublicSharedLogoResult> {

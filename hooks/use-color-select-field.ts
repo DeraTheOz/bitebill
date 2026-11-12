@@ -26,6 +26,7 @@ export type UseColorSelectFieldOptions = {
   disabled?: boolean;
 };
 
+/** Manages color preset dropdown state, hex normalization, and optional EyeDropper sampling. */
 export function useColorSelectField({
   id,
   name,

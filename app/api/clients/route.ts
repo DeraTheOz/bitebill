@@ -10,6 +10,7 @@ const listClientsQuerySchema = z.object({
   activity: z.enum(["with", "without"]).optional(),
 });
 
+/** Lists paginated clients for the authenticated user with optional search and activity filters. */
 export async function GET(request: Request) {
   const user = await getSessionUser();
 
@@ -33,6 +34,7 @@ export async function GET(request: Request) {
   }
 }
 
+/** Creates a new client owned by the authenticated user. */
 export async function POST(request: Request) {
   const user = await getSessionUser();
 

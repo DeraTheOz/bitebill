@@ -3,6 +3,7 @@ export type Country = {
   name: string;
 };
 
+/** Supported countries list used across address and country selectors. */
 export const COUNTRIES: readonly Country[] = [
   { code: "AF", name: "Afghanistan" },
   { code: "AL", name: "Albania" },
@@ -201,6 +202,7 @@ export const COUNTRIES: readonly Country[] = [
   { code: "ZW", name: "Zimbabwe" },
 ] as const;
 
+/** Mapping from ISO 3166-1 alpha-2 country codes to default ISO 4217 currency codes. */
 export const COUNTRY_CURRENCIES: Record<string, string> = {
   US: "USD",
   GB: "GBP",
@@ -273,6 +275,7 @@ export const COUNTRY_CURRENCIES: Record<string, string> = {
   ET: "ETB",
 };
 
+/** Returns the default ISO 4217 currency code for a given country name or ISO alpha-2 code. */
 export function getCurrencyForCountry(countryNameOrCode: string): string | undefined {
   if (!countryNameOrCode) return undefined;
   const normalized = countryNameOrCode.trim().toLowerCase();

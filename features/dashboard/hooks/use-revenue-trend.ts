@@ -7,9 +7,11 @@ import type { ChartDropdownOption } from "./use-chart-dropdown";
 
 export type { MetricKey };
 
+/** Rounds a floating-point monetary amount to 2 decimal places. */
 const round2 = (val: number) =>
   Math.round((val + Number.EPSILON) * 100) / 100;
 
+/** Computes interactive metric filtering, month-over-month deltas, and scope selectors for revenue charts. */
 export function useRevenueTrend(
   trends: MonthlyRevenueTrend[],
   period = "6m",
@@ -17,6 +19,11 @@ export function useRevenueTrend(
 ) {
   const [activeMetric, setActiveMetric] = useState<MetricKey>("total");
   const [selectedScope, setSelectedScope] = useState<string>("period");
+
+  const hasRevenue = useMemo(
+    () => trends.some((t) => t.paid > 0 || t.pending > 0 || t.overdue > 0),
+    [trends],
+  );
 
   // Sum of active metric across the entire trend array
   const periodTotal = useMemo(() => {
@@ -137,6 +144,7 @@ export function useRevenueTrend(
     resetToPeriod,
     selectedMonthData: currentMonthData,
     previousMonthData,
+    hasRevenue,
   };
 }
 

@@ -13,6 +13,7 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+/** Validates session ownership and UUID syntax for invoice share route parameters. */
 async function resolveOwnerAndInvoiceId(params: RouteContext["params"]) {
   const user = await getSessionUser();
   if (!user) {
@@ -31,6 +32,7 @@ async function resolveOwnerAndInvoiceId(params: RouteContext["params"]) {
   return { userId: user.id, invoiceId: id };
 }
 
+/** Returns the active public share metadata for an owned invoice, if any. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const ctx = await resolveOwnerAndInvoiceId(params);
   if ("error" in ctx) return ctx.error;
@@ -51,6 +53,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   }
 }
 
+/** Creates or regenerates a public share link for an owned invoice. */
 export async function POST(request: Request, { params }: RouteContext) {
   const ctx = await resolveOwnerAndInvoiceId(params);
   if ("error" in ctx) return ctx.error;
@@ -96,6 +99,7 @@ export async function POST(request: Request, { params }: RouteContext) {
   }
 }
 
+/** Updates the expiration timestamp of an existing invoice share link. */
 export async function PATCH(request: Request, { params }: RouteContext) {
   const ctx = await resolveOwnerAndInvoiceId(params);
   if ("error" in ctx) return ctx.error;
@@ -142,6 +146,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 }
 
+/** Revokes the public share link for an owned invoice. */
 export async function DELETE(_request: Request, { params }: RouteContext) {
   const ctx = await resolveOwnerAndInvoiceId(params);
   if ("error" in ctx) return ctx.error;

@@ -18,7 +18,7 @@ import {
   lightenHex,
   readableOnWhite,
   readableTextColor,
-} from "@/features/onboarding/lib/brand-colors";
+} from "@/features/branding/lib/brand-colors";
 
 export const BITEBILL_LOGO_SVG_PATH =
   "M10.6942 0L20 18.7078L29.3058 0C35.6645 3.34856 40 10.0219 40 17.7078C40 28.7535 31.0457 37.7078 20 37.7078C8.9543 37.7078 0 28.7535 0 17.7078C0 10.0219 4.33546 3.34856 10.6942 0Z";

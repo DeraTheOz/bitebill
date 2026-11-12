@@ -8,6 +8,7 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+/** Fetches a single owned client record and related summary details. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 
@@ -31,6 +32,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   }
 }
 
+/** Updates an owned client record with validated form fields. */
 export async function PUT(request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 
@@ -69,6 +71,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
   }
 }
 
+/** Soft-deletes an owned client record by id. */
 export async function DELETE(_request: Request, { params }: RouteContext) {
   const user = await getSessionUser();
 

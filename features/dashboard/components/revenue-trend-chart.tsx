@@ -24,6 +24,9 @@ import { useRevenueTrend } from "../hooks/use-revenue-trend";
 import { FxTooltip } from "./fx-tooltip";
 import { ChartDropdown } from "./chart-dropdown";
 
+const ALL_STREAM_KEYS = ["paid", "pending", "overdue"] as const;
+const EMPTY_TREND_COLOR = "#94a3b8";
+
 export function RevenueTrendChart({
   trends,
   currency,
@@ -57,6 +60,7 @@ export function RevenueTrendChart({
     resetToPeriod,
     selectedMonthData,
     previousMonthData,
+    hasRevenue,
   } = useRevenueTrend(trends, period, availableYears);
 
   const isMounted = useIsMounted();
@@ -204,7 +208,7 @@ export function RevenueTrendChart({
           {activeMetric === "total" ? (
             <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-light">
-                Stacked breakdown:
+                Revenue streams:
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-status-paid" />
@@ -267,22 +271,45 @@ export function RevenueTrendChart({
               }}
               margin={{ top: 14, right: 6, left: -6, bottom: 0 }}>
               <defs>
+                <linearGradient id="emptyFxGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor={EMPTY_TREND_COLOR}
+                    stopOpacity={0.22}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={EMPTY_TREND_COLOR}
+                    stopOpacity={0.0}
+                  />
+                </linearGradient>
                 <linearGradient id="totalFxGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#7c5dfa" stopOpacity={0.28} />
                   <stop offset="95%" stopColor="#7c5dfa" stopOpacity={0.0} />
                 </linearGradient>
-                <linearGradient id="paidFxGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#33d69f" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#33d69f" stopOpacity={0.05} />
-                </linearGradient>
-                <linearGradient id="pendingFxGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ff8f00" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#ff8f00" stopOpacity={0.05} />
-                </linearGradient>
-                <linearGradient id="overdueFxGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ec5757" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#ec5757" stopOpacity={0.05} />
-                </linearGradient>
+                {ALL_STREAM_KEYS.map((key) => {
+                  const config = metricConfig[key];
+                  return (
+                    <linearGradient
+                      key={config.gradientId}
+                      id={config.gradientId}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1">
+                      <stop
+                        offset="5%"
+                        stopColor={config.color}
+                        stopOpacity={0.35}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={config.color}
+                        stopOpacity={0.05}
+                      />
+                    </linearGradient>
+                  );
+                })}
               </defs>
 
               <CartesianGrid
@@ -341,55 +368,48 @@ export function RevenueTrendChart({
               />
 
               {activeMetric === "total" ? (
-                <>
+                hasRevenue ? (
+                  ALL_STREAM_KEYS.map((key) => {
+                    const config = metricConfig[key];
+                    return (
+                      <Area
+                        key={`all-${key}`}
+                        type="monotone"
+                        dataKey={key}
+                        stroke={config.color}
+                        strokeWidth={2.5}
+                        fill={`url(#${config.gradientId})`}
+                        fillOpacity={0.45}
+                        dot={false}
+                        activeDot={{
+                          r: 5,
+                          strokeWidth: 2,
+                          stroke: "#ffffff",
+                          fill: config.color,
+                        }}
+                      />
+                    );
+                  })
+                ) : (
                   <Area
+                    key="empty-total"
                     type="monotone"
-                    dataKey="paid"
-                    stackId="revenue"
-                    stroke="#33d69f"
+                    dataKey="total"
+                    stroke={EMPTY_TREND_COLOR}
                     strokeWidth={2.5}
-                    fill="url(#paidFxGrad)"
+                    fill="url(#emptyFxGrad)"
                     dot={false}
                     activeDot={{
                       r: 5,
                       strokeWidth: 2,
                       stroke: "#ffffff",
-                      fill: "#33d69f",
+                      fill: EMPTY_TREND_COLOR,
                     }}
                   />
-                  <Area
-                    type="monotone"
-                    dataKey="pending"
-                    stackId="revenue"
-                    stroke="#ff8f00"
-                    strokeWidth={2.5}
-                    fill="url(#pendingFxGrad)"
-                    dot={false}
-                    activeDot={{
-                      r: 5,
-                      strokeWidth: 2,
-                      stroke: "#ffffff",
-                      fill: "#ff8f00",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="overdue"
-                    stackId="revenue"
-                    stroke="#ec5757"
-                    strokeWidth={2.5}
-                    fill="url(#overdueFxGrad)"
-                    dot={false}
-                    activeDot={{
-                      r: 5,
-                      strokeWidth: 2,
-                      stroke: "#ffffff",
-                      fill: "#ec5757",
-                    }}
-                  />
-                </>
+                )
               ) : (
                 <Area
+                  key={activeMetric}
                   type="monotone"
                   dataKey={activeMetric}
                   stroke={activeConfig.color}

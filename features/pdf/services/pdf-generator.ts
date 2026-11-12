@@ -5,6 +5,7 @@ import { renderClassicTemplate } from "./templates/classic";
 import { renderModernTemplate } from "./templates/modern";
 import { renderCorporateTemplate } from "./templates/corporate";
 
+/** Builds a metadata-tagged PDF byte buffer for an invoice using the selected template style. */
 export async function generateInvoicePdf(
   options: GeneratePdfOptions,
 ): Promise<Uint8Array> {

@@ -14,6 +14,7 @@ const EMPTY_COUNTS = {
   draft: 0,
 };
 
+/** Manages paginated, status-filtered invoice history on a client detail view. */
 export function useClientInvoice(clientId: string) {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>("all");
   const [page, setPage] = useState(1);

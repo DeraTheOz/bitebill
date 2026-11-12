@@ -5,6 +5,7 @@ import { getPublicSharedInvoiceLogo } from "@/features/sharing/services/shares";
 
 type RouteContext = { params: Promise<{ token: string }> };
 
+/** Serves the branding logo associated with a valid public invoice share link. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const { token } = await params;
   const parsed = shareTokenSchema.safeParse(token);

@@ -3,6 +3,7 @@ import { downloadFileFromEndpoint } from "@/lib/download";
 import type { CreateShareInput } from "../schemas/share-schema";
 import type { InvoiceShare, PublicSharedInvoice } from "../types/share";
 
+/** Sends a JSON request to a share API endpoint and throws `ApiError` on failure. */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -21,6 +22,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+/** Typed client wrapper around invoice sharing and public share endpoints. */
 export const sharingApi = {
   getForInvoice: async (invoiceId: string) => {
     const { share } = await request<{ share: InvoiceShare | null }>(

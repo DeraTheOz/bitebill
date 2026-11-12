@@ -20,6 +20,7 @@ export type UseClientPickerOptions = {
   disabled?: boolean;
 };
 
+/** Manages searchable client picker dropdown state, debounced remote search, and keyboard navigation. */
 export function useClientPicker({
   value,
   onChange,

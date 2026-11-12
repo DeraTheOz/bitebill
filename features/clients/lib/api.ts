@@ -18,6 +18,7 @@ export type ClientListResult = {
   pagination: ClientListPagination;
 };
 
+/** Client HTTP error thrown when a client API request fails. */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -28,6 +29,7 @@ export class ApiError extends Error {
   }
 }
 
+/** Sends a JSON request to the clients API and unwraps error messages. */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -46,6 +48,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+/** Typed client wrapper around the `/api/clients` endpoints. */
 export const clientsApi = {
   list: async ({ page, pageSize = 10, q, activity }: ClientListRequest) => {
     const search = new URLSearchParams({

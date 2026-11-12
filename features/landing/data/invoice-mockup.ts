@@ -4,6 +4,7 @@ export type MockupItem = {
   amount: number;
 };
 
+/** Sample line items displayed inside the hero invoice mockup card. */
 export const invoiceItems: MockupItem[] = [
   { name: "Brand identity & logo design", quantity: 1, amount: 1850 },
   { name: "Landing page design", quantity: 3, amount: 1920 },

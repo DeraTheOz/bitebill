@@ -4,6 +4,7 @@ export type Step = {
   description: string;
 };
 
+/** Three-step onboarding walkthrough items rendered on the landing page. */
 export const steps: Step[] = [
   {
     number: "1",

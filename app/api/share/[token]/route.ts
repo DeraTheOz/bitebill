@@ -5,6 +5,7 @@ import { getPublicSharedInvoice } from "@/features/sharing/services/shares";
 
 type RouteContext = { params: Promise<{ token: string }> };
 
+/** Returns sanitized public invoice data for a valid, unexpired share token. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const { token } = await params;
   const parsed = shareTokenSchema.safeParse(token);

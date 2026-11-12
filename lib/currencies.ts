@@ -4,6 +4,7 @@ export type Currency = {
   symbol: string;
 };
 
+/** Supported billing currencies available for branding and invoice defaults. */
 export const CURRENCIES: readonly Currency[] = [
   { code: "USD", name: "US Dollar", symbol: "$" },
   { code: "EUR", name: "Euro", symbol: "€" },

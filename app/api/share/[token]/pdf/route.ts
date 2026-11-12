@@ -5,6 +5,7 @@ import { getPublicSharedInvoicePdf } from "@/features/sharing/services/shares";
 
 type RouteContext = { params: Promise<{ token: string }> };
 
+/** Generates and downloads the PDF document for a publicly shared invoice. */
 export async function GET(_request: Request, { params }: RouteContext) {
   const { token } = await params;
   const parsed = shareTokenSchema.safeParse(token);

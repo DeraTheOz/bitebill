@@ -16,6 +16,7 @@ export type Feature = {
   description: string;
 };
 
+/** Core platform capabilities highlighted in the landing page feature grid. */
 export const features: Feature[] = [
   {
     icon: FileText,

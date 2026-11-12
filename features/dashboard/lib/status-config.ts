@@ -1,6 +1,7 @@
 // Shared status config for pie chart and legend
 import type { InvoiceStatus } from "@/features/invoices/types/invoice";
 
+/** Shared display labels and colors for invoice status distribution charts and legends. */
 export const statusConfig: Record<
   InvoiceStatus,
   { label: string; color: string; dot: string }

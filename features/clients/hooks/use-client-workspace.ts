@@ -4,6 +4,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import type { ClientActivityFilter } from "../types/client";
 import type { ClientListActivityFilter } from "../components/client-filter";
 
+/** Manages search, activity filter, pagination, and create drawer state for the clients page. */
 export function useClientWorkspace() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);

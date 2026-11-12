@@ -4,11 +4,13 @@ import { invoiceKeys } from "@/features/invoices/hooks/use-invoice-queries";
 import { sharingApi } from "../lib/api";
 import type { CreateShareInput } from "../schemas/share-schema";
 
+/** TanStack Query key factory for private invoice share settings and public share views. */
 export const shareKeys = {
   byInvoice: (invoiceId: string) => ["invoice-share", invoiceId] as const,
   public: (token: string) => ["public-share", token] as const,
 };
 
+/** Fetches public share link metadata for an owned invoice. */
 export function useInvoiceShare(invoiceId: string) {
   return useQuery({
     queryKey: shareKeys.byInvoice(invoiceId),
@@ -17,6 +19,7 @@ export function useInvoiceShare(invoiceId: string) {
   });
 }
 
+/** Creates or regenerates a public share link and refreshes dependent invoice/dashboard caches. */
 export function useCreateInvoiceShare(invoiceId: string) {
   const queryClient = useQueryClient();
 
@@ -33,6 +36,7 @@ export function useCreateInvoiceShare(invoiceId: string) {
   });
 }
 
+/** Updates the expiration timestamp of an active invoice share link. */
 export function useUpdateInvoiceShare(invoiceId: string) {
   const queryClient = useQueryClient();
 
@@ -45,6 +49,7 @@ export function useUpdateInvoiceShare(invoiceId: string) {
   });
 }
 
+/** Revokes an invoice's public share link and clears cached share state. */
 export function useRevokeInvoiceShare(invoiceId: string) {
   const queryClient = useQueryClient();
 
@@ -60,6 +65,7 @@ export function useRevokeInvoiceShare(invoiceId: string) {
   });
 }
 
+/** Fetches sanitized public invoice data for a share token with caching tuned to avoid duplicate view logs. */
 export function usePublicShare(token: string) {
   return useQuery({
     queryKey: shareKeys.public(token),
@@ -74,6 +80,7 @@ export function usePublicShare(token: string) {
   });
 }
 
+/** Triggers a browser PDF download for a publicly shared invoice. */
 export function useDownloadPublicSharePdf() {
   return useMutation({
     mutationFn: ({

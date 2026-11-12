@@ -1,3 +1,4 @@
+/** Maps public share lookup failures (`not-found` or `expired`) to JSON HTTP responses. */
 export function shareOutcomeErrorResponse(outcome: "not-found" | "expired") {
   if (outcome === "expired") {
     return Response.json(

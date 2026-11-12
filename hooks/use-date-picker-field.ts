@@ -14,6 +14,7 @@ export type UseDatePickerFieldOptions = {
   align?: "start" | "end";
 };
 
+/** Manages calendar popover state, min/max constraints, and ISO date formatting for date pickers. */
 export function useDatePickerField({
   value,
   onChange,

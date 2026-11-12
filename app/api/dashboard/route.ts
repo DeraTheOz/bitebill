@@ -3,6 +3,7 @@ import { getDashboardData } from "@/features/dashboard/services/dashboard";
 
 export const dynamic = "force-dynamic";
 
+/** Returns revenue analytics, status counts, and trend series for the requested period. */
 export async function GET(request: Request) {
   const user = await getSessionUser();
 

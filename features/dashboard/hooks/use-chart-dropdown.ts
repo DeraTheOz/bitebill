@@ -15,6 +15,7 @@ export type UseChartDropdownOptions = {
   options: readonly ChartDropdownOption[];
 };
 
+/** Manages open state, outside click, and Escape handling for dashboard chart scope selectors. */
 export function useChartDropdown({
   value,
   onChange,

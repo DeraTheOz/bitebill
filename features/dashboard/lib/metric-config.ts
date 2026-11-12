@@ -1,6 +1,7 @@
 // Shared metric config for revenue trend chart tabs
 export type MetricKey = "total" | "paid" | "pending" | "overdue";
 
+/** Shared metric labels, colors, and SVG gradient ids for revenue trend tabs and charts. */
 export const metricConfig: Record<
   MetricKey,
   { label: string; tabLabel: string; color: string; gradientId: string }

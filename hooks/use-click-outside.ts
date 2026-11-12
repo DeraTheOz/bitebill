@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 
+/** Invokes `onOutsideClick` when a pointerdown event occurs outside `ref` unless marked with `data-click-outside-ignore`. */
 export function useClickOutside<T extends HTMLElement>(
   ref: RefObject<T | null>,
   onOutsideClick: () => void,
