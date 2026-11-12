@@ -13,6 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { clients } from "./clients";
+import { recurringInvoiceTemplates } from "./recurring-invoices";
 import { users } from "./users";
 
 // `overdue` is intentionally NOT part of this enum
@@ -40,6 +41,11 @@ export const invoices = pgTable(
     clientId: uuid("client_id")
       .references(() => clients.id, { onDelete: "cascade" })
       .notNull(),
+
+    recurringTemplateId: uuid("recurring_template_id").references(
+      () => recurringInvoiceTemplates.id,
+      { onDelete: "set null" },
+    ),
 
     // Human-facing number (INV-0001) plus the numeric sequence that
     // produced it. Both are unique per user; the sequence is the
@@ -89,6 +95,7 @@ export const invoices = pgTable(
     // Serves the paginated list: WHERE user_id = ? ORDER BY created_at DESC.
     index("invoices_user_created_idx").on(table.userId, table.createdAt.desc()),
     index("invoices_client_id_idx").on(table.clientId),
+    index("invoices_recurring_template_idx").on(table.recurringTemplateId),
     index("invoices_status_idx").on(table.status),
     uniqueIndex("invoices_user_number_idx").on(
       table.userId,
