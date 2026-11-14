@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, League_Spartan } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./providers";
 import { ThemeProvider } from "@/features/theme/provider/theme-provider";
 import { themeInitScript } from "@/features/theme/theme";
+import { PwaRegister } from "@/components/pwa-register";
 
 const leagueSpartan = League_Spartan({
   variable: "--font-league-spartan",
@@ -16,10 +17,37 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#7c5dfa" },
+    { media: "(prefers-color-scheme: dark)", color: "#141625" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
-  title: "BiteBill",
+  title: {
+    default: "BiteBill",
+    template: "%s | BiteBill",
+  },
   description:
     "BiteBill is an invoicing application that enables freelancers, consultants, agencies, and small businesses to create professional invoices, manage clients, track payments, generate branded PDF invoices, and monitor business performance through a comprehensive analytics dashboard.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BiteBill",
+  },
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    shortcut: "/icons/icon-192x192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -37,6 +65,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ThemeProvider>{children}</ThemeProvider>
 
           <Toaster />
+          <PwaRegister />
         </Providers>
       </body>
     </html>

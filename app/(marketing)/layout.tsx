@@ -7,7 +7,9 @@ import { getLandingUser } from "@/features/landing/lib/session";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "BiteBill — Beautiful invoicing for freelancers & small businesses",
+  title: {
+    absolute: "Beautiful invoicing for freelancers & small businesses",
+  },
   description:
     "Create branded PDF invoices, manage clients, share public payment links, automate recurring billing, and track revenue with a fast, type-safe invoicing platform.",
 };
