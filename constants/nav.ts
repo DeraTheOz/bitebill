@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   FileText,
   LayoutDashboard,
   Repeat,
@@ -16,6 +17,7 @@ export type NavItem = {
 /** Primary workspace navigation destinations rendered in the app sidebar and mobile menu. */
 export const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/clients", label: "Clients", icon: Users },
   { href: "/invoices", label: "Invoices", icon: FileText },
   { href: "/recurring-invoices", label: "Recurring", icon: Repeat },
